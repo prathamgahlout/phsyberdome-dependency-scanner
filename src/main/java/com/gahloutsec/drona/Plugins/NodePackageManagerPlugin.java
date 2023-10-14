@@ -11,6 +11,7 @@ import com.gahloutsec.drona.Models.Dependencies;
 import com.gahloutsec.drona.Models.Module;
 import com.gahloutsec.drona.Models.DependencyManager;
 import com.gahloutsec.drona.SysRunner;
+import com.gahloutsec.drona.licensedetector.LicenseDetector;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -37,6 +38,13 @@ public class NodePackageManagerPlugin implements PluginInterface{
     private DependencyManager pm;
     
     private Dependencies modules;
+    private LicenseDetector licenseDetector;
+
+    public NodePackageManagerPlugin(LicenseDetector licenseDetector) {
+        this.licenseDetector = licenseDetector;
+    }
+    
+    
 
    
     @Override
@@ -53,15 +61,15 @@ public class NodePackageManagerPlugin implements PluginInterface{
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.createObjectNode() ;
         try {
-            node = mapper.readTree(path.toFile());
+            node = mapper.readTree(path.toFile());        
+            getRootModuleWithDependencies(node);
         } catch (IOException ex) {
             Logger.getLogger(NodePackageManagerPlugin.class.getName()).log(Level.SEVERE, null, ex);
+            return;
         }
         
         
-        Path modulePath = Configuration.getConfiguration().getBasePath().resolve("node_modules");
         
-        getRootModuleWithDependencies(node);
     }
     
     private void getRootModuleWithDependencies(JsonNode node) {
@@ -79,8 +87,11 @@ public class NodePackageManagerPlugin implements PluginInterface{
             JsonNode body = field.getValue();
             String pkgVersion = body.get("version").asText("null");
             Module m = new Module(pkgName, pkgVersion);
+            Path modulePath = Configuration.getConfiguration().getBasePath().resolve("node_modules/" + pkgName);
+            String license = getLicenseOfModule(modulePath);
+            m.setLicense(license);
             if(body.get("dependencies") != null) {
-                ArrayList<Module> deps_t = resolveTransientDependencies(body.get("dependencies"));
+                ArrayList<Module> deps_t = resolveTransitiveDependencies(body.get("dependencies"));
                 m.setDependencies(deps_t);
             }
             root.addToDependencies(m);
@@ -89,7 +100,7 @@ public class NodePackageManagerPlugin implements PluginInterface{
         modules.addToDependencies(root);
     }
     
-    private ArrayList<Module> resolveTransientDependencies(JsonNode node) {
+    private ArrayList<Module> resolveTransitiveDependencies(JsonNode node) {
         ArrayList<Module> deps = new ArrayList<>();
         Iterator<Map.Entry<String,JsonNode>> iter = node.fields();
         while(iter.hasNext()) {
@@ -98,8 +109,11 @@ public class NodePackageManagerPlugin implements PluginInterface{
             JsonNode body = field.getValue();
             String pkgVersion = body.get("version").asText("null");
             Module m = new Module(pkgName, pkgVersion);
+            Path modulePath = Configuration.getConfiguration().getBasePath().resolve("node_modules/" + pkgName);
+            String license = getLicenseOfModule(modulePath);
+            m.setLicense(license);
             if(body.get("dependencies") != null) {
-                ArrayList<Module> deps_t = resolveTransientDependencies(body.get("dependencies"));
+                ArrayList<Module> deps_t = resolveTransitiveDependencies(body.get("dependencies"));
                 m.setDependencies(deps_t);
             }
             deps.add(m);
@@ -107,12 +121,10 @@ public class NodePackageManagerPlugin implements PluginInterface{
         return deps;
     }
     
-    private void readLicense(String path) {
-        
-    }
+    
     
     @Override
-    public Dependencies getModules() {
+     public Dependencies getModules() {
         return this.modules;
     }
     
@@ -138,6 +150,10 @@ public class NodePackageManagerPlugin implements PluginInterface{
     private String extractVersion(String d) {
         String[] s = d.split("@");
         return s[s.length - 1];
+    }
+    
+    private String getLicenseOfModule(Path path) {
+        return licenseDetector.detect(path);
     }
 
     @Override

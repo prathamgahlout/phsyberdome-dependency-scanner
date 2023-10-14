@@ -11,12 +11,14 @@ import java.util.ArrayList;
 public class Module {
     private String name;
     private String version;
+    private String license;
     private ArrayList<Module> dependencies;
 
     public Module(String name, String version) {
         this.name = name;
         this.version = version;
         dependencies = new ArrayList<>();
+        this.license = "null";
     }
 
     public Module(String name, String version, ArrayList<Module> dependencies) {
@@ -45,5 +47,14 @@ public class Module {
     public void addToDependencies(Module m) {
         dependencies.add(m);
     }
+
+    public String getLicense() {
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
+    }
         
+    
 }
