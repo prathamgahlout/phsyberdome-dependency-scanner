@@ -3,6 +3,7 @@
 package com.gahloutsec.drona;
 
 import com.gahloutsec.drona.ConfigurationInterface;
+import com.gahloutsec.drona.Plugins.JavaMavenPlugin;
 import com.gahloutsec.drona.Plugins.NodePackageManagerPlugin;
 import com.gahloutsec.drona.licensedetector.LicenseDetector;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class PluginRegistry {
     
     private void init() {
         plugins.add(new NodePackageManagerPlugin(licenseDetector));
+        plugins.add(new JavaMavenPlugin(licenseDetector));
     }
 
     public ArrayList<PluginInterface> getPlugins() {

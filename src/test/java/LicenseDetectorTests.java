@@ -1,5 +1,6 @@
 
 import com.gahloutsec.drona.licensedetector.LicenseDatabase;
+import com.gahloutsec.drona.licensedetector.LicenseDetector;
 import com.gahloutsec.drona.licensedetector.Normalizer;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LicenseDetectorTests {
     
     LicenseDatabase db;
+    LicenseDetector detector;
     public LicenseDetectorTests() {
     }
     
@@ -30,6 +32,7 @@ public class LicenseDetectorTests {
     @BeforeEach
     public void setUp() {
         db = new LicenseDatabase();
+        detector = new LicenseDetector();
     }
     
     @AfterEach
@@ -89,4 +92,23 @@ public class LicenseDetectorTests {
         
         assertTrue(res.entrySet().iterator().next().getKey().equals("BSD-3-Clause"));
     }
+    
+    @Test
+    public void TestDetectorWithZipUrl(){
+        String artifactUrl = "https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar";
+        
+        String result = detector.detect(artifactUrl);
+        assertTrue(result.equals("EPL-1.0"));
+    }
+    
+    @Test
+    public void TestDetecterWithGitURL() {
+        
+        String repoUrl = "https://github.com/prathamgahlout/WallRoach-wallpaper-android-app";
+        
+        String result = detector.detect(repoUrl);
+        assertTrue(result.equals("Apache-2.0"));
+    }
+    
+        
 }

@@ -1,29 +1,22 @@
 package com.gahloutsec.drona.Plugins;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gahloutsec.drona.Configuration;
 import com.gahloutsec.drona.PluginInterface;
-import com.gahloutsec.drona.ConfigurationInterface;
 import com.gahloutsec.drona.Models.Dependencies;
 import com.gahloutsec.drona.Models.Module;
 import com.gahloutsec.drona.Models.DependencyManager;
 import com.gahloutsec.drona.SysRunner;
 import com.gahloutsec.drona.licensedetector.LicenseDetector;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  *
@@ -58,17 +51,20 @@ public class NodePackageManagerPlugin implements PluginInterface{
         pm = new DependencyManager("npm",version);
         // Read the package-lock.json
         Path path = Configuration.getConfiguration().getBasePath().resolve("package-lock.json");
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = mapper.createObjectNode() ;
-        try {
-            node = mapper.readTree(path.toFile());        
-            getRootModuleWithDependencies(node);
-        } catch (IOException ex) {
-            Logger.getLogger(NodePackageManagerPlugin.class.getName()).log(Level.SEVERE, null, ex);
-            return;
+        if(path.toFile().exists()){
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node = mapper.createObjectNode() ;
+            try {
+                node = mapper.readTree(path.toFile());        
+                getRootModuleWithDependencies(node);
+            } catch (IOException ex) {
+                Logger.getLogger(NodePackageManagerPlugin.class.getName()).log(Level.SEVERE, null, ex);
+                return;
+            }
+            licenseDetector.printScanStats();
+        }else{
+            System.out.println("Project does not has npm as its package manager!");
         }
-        
-        
         
     }
     
@@ -153,7 +149,7 @@ public class NodePackageManagerPlugin implements PluginInterface{
     }
     
     private String getLicenseOfModule(Path path) {
-        return licenseDetector.detect(path);
+        return licenseDetector.detect(path.toString());
     }
 
     @Override
