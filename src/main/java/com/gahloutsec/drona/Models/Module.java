@@ -12,6 +12,7 @@ public class Module {
     private String name;
     private String version;
     private String license;
+    private String supplier;
     private ArrayList<Module> dependencies;
 
     public Module(String name, String version) {
@@ -19,6 +20,7 @@ public class Module {
         this.version = version;
         dependencies = new ArrayList<>();
         this.license = "null";
+        this.supplier = "null";
     }
 
     public Module(String name, String version, ArrayList<Module> dependencies) {
@@ -55,6 +57,15 @@ public class Module {
     public void setLicense(String license) {
         this.license = license;
     }
+
+    public String getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(String supplier) {
+        this.supplier = supplier;
+    }
         
+    
     
 }

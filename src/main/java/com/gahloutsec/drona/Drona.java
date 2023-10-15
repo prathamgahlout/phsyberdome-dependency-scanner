@@ -2,6 +2,7 @@ package com.gahloutsec.drona;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gahloutsec.drona.Models.DependencyScanResult;
+import com.gahloutsec.drona.Utils.FileUtil;
 import com.gahloutsec.drona.Utils.JSONHelper;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -31,6 +32,8 @@ public class Drona {
         } catch (JsonProcessingException ex) {
             Logger.getLogger(Drona.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        FileUtil.cleanup();
     }
     
 }

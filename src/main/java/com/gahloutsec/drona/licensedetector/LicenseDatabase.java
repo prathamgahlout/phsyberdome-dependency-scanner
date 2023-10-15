@@ -4,18 +4,13 @@ package com.gahloutsec.drona.licensedetector;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.hash.HashFunction;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -138,6 +133,8 @@ public class LicenseDatabase {
     }
     
     public void loadLicenses() {
+        
+        System.out.println("Started building hashes...");
         /* Load the metadata */
         loadURLs();
         loadNames();
@@ -158,7 +155,6 @@ public class LicenseDatabase {
                 JsonNode jsonNode = mapper.readTree(in);
                 String normLicenseText = Normalizer.normalize(jsonNode.get("licenseText").asText("null"));
                 licenseTexts.put(id, normLicenseText);
-                System.out.println("Processing license: " + id);
                 if(minimumLicenseTextLength == 0 || minimumLicenseTextLength > normLicenseText.length()) {
                     minimumLicenseTextLength = normLicenseText.length();
                 }
@@ -223,8 +219,9 @@ public class LicenseDatabase {
             }
             // Add this list against the licenseId
             lsh.Add(pair.getKey(), set);
-            System.out.println("Added signature for " + pair.getKey());
         }
+        
+        System.out.println("Hash building completed!");
         
     }
     
