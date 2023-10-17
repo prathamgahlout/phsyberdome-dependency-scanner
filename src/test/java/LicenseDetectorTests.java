@@ -97,7 +97,7 @@ public class LicenseDetectorTests {
     public void TestDetectorWithZipUrl(){
         String artifactUrl = "https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar";
         
-        String result = detector.detect(artifactUrl);
+        String result = detector.detect(artifactUrl).first;
         assertTrue(result.equals("EPL-1.0"));
     }
     
@@ -106,7 +106,7 @@ public class LicenseDetectorTests {
         
         String repoUrl = "https://github.com/prathamgahlout/WallRoach-wallpaper-android-app";
         
-        String result = detector.detect(repoUrl);
+        String result = detector.detect(repoUrl).first;
         assertTrue(result.equals("Apache-2.0"));
     }
     

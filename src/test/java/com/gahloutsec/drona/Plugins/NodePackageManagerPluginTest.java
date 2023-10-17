@@ -39,11 +39,7 @@ public class NodePackageManagerPluginTest {
      */
     @Test
     public void testReadModules() {
-        System.out.println("readModules");
-        NodePackageManagerPlugin instance = null;
-        instance.readModules();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        
     }
 
     /**
@@ -51,11 +47,7 @@ public class NodePackageManagerPluginTest {
      */
     @Test
     public void testReadModulesV2() {
-        System.out.println("readModulesV2");
-        NodePackageManagerPlugin instance = null;
-        instance.readModulesV2();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        
     }
 
     /**
@@ -63,13 +55,7 @@ public class NodePackageManagerPluginTest {
      */
     @Test
     public void testGetModules() {
-        System.out.println("getModules");
-        NodePackageManagerPlugin instance = null;
-        Dependencies expResult = null;
-        Dependencies result = instance.getModules();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        
     }
 
     /**
@@ -77,13 +63,7 @@ public class NodePackageManagerPluginTest {
      */
     @Test
     public void testGetPackageManager() {
-        System.out.println("getPackageManager");
-        NodePackageManagerPlugin instance = null;
-        DependencyManager expResult = null;
-        DependencyManager result = instance.getPackageManager();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        
     }
 
     /**

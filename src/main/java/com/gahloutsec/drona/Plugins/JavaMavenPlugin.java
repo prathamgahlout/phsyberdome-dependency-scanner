@@ -2,11 +2,13 @@
 
 package com.gahloutsec.drona.Plugins;
 
+import com.gahloutsec.drona.Configuration;
 import com.gahloutsec.drona.Models.Dependencies;
 import com.gahloutsec.drona.Models.DependencyManager;
 import com.gahloutsec.drona.PluginInterface;
 import com.gahloutsec.drona.licensedetector.LicenseDetector;
 import com.gahloutsec.drona.Models.Module;
+import com.gahloutsec.drona.Models.Pair;
 import com.gahloutsec.drona.Utils.FileUtil;
 import com.gahloutsec.drona.Utils.PomReader;
 import java.io.File;
@@ -107,6 +109,7 @@ public class JavaMavenPlugin implements PluginInterface
         }else{
             System.out.println("pom file not found at " + path.toAbsolutePath().toString());
         }
+        licenseDetector.printScanStats();
     }
     
     
@@ -114,13 +117,15 @@ public class JavaMavenPlugin implements PluginInterface
     private void getLicenseAndTransitiveDependenciesForModule(Module root) {
         System.out.println("Building dep tree for "+root.getName());
         String repoUrlString = buildRepositoryUrl(root);
-        String loc = "/.drona/temp/remote_clones/";
+        String loc = Configuration.getConfiguration().getCloneLocation().toString();
         Path path = FileUtil.getFilePathFromURL(repoUrlString,loc);
         if(path == null){
             return;
         }
         buildDependencyTree(root,path);
-        root.setLicense(licenseDetector.detect(path.toString()));
+        Pair<String,String> detectionResult = licenseDetector.detect(path.toString());
+        root.setLicense(detectionResult.first);
+        root.setAnalyzedContent(detectionResult.second);
     }
 
     private void buildDependencyTree(Module root, Path pathToModule) {

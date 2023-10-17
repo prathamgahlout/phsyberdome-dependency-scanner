@@ -44,7 +44,7 @@ public class LSH {
             String licenseId = pair.getKey();
             
             double similarity = minHash.estimateJaccardSimilarity(querySig, sig);
-            if(similarity > 0.75)
+            if(similarity > 0.7)
                 result.put(licenseId, similarity);
         }
         

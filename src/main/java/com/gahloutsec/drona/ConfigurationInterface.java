@@ -11,4 +11,5 @@ public interface ConfigurationInterface {
     public Path getBasePath();
     public void setBasePath(String path);
     public void setBasePath(Path path);
+    public Path getCloneLocation();
 }
