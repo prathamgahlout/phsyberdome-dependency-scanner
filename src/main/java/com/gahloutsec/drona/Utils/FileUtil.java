@@ -6,13 +6,18 @@ import com.gahloutsec.drona.licensedetector.LicenseDetector;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -20,7 +25,12 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -37,6 +47,7 @@ public class FileUtil {
         
         if (file.isDirectory()) {
             File[] arr = file.listFiles();
+            sortListOfFilesToKeepDirectoriesAtEnd(arr);
             for (File f : arr) {
                 File found = searchFile(f, searchRegex);
                 if (found != null)
@@ -52,6 +63,24 @@ public class FileUtil {
             }
         }
         return null;
+    }
+    
+    private static void sortListOfFilesToKeepDirectoriesAtEnd(File[] arr){
+        Arrays.sort(arr, new Comparator<File>(){
+            @Override
+            public int compare(File o1, File o2) {
+                if(o1.isDirectory() && o2.isDirectory()){
+                    return 0;
+                }else if(o1.isDirectory()){
+                    return 1;
+                }else if(o2.isDirectory()){
+                    return -1;
+                }else{
+                    return 0;
+                }
+            }
+            
+        });
     }
     
     
@@ -79,14 +108,19 @@ public class FileUtil {
                 // Should I try to GET the file pointed by the URL
                 System.out.println("Trying to download the file...");
                 try {
-                    URL url = new URL(path);
-                    File file = FileSystems.getDefault().getPath(cloneLocation + UUID.randomUUID().toString() +".zip").toFile();
+                    URL url = new URL(path);  
+                    
+                    File file = FileSystems.getDefault().getPath(cloneLocation + FilenameUtils.getName(url.getPath())).toFile();
                     if(file.exists()) {
                         deleteDirectory(file);
                     }
                     FileUtils.copyURLToFile(url, file);
                     String uuid = UUID.randomUUID().toString();
-                    extractFolder(file.toPath().toString(), cloneLocation + uuid);
+                    if(FilenameUtils.getExtension(url.getPath()).equals("zip")){
+                        extractZipFolder(file.toPath().toString(), cloneLocation + uuid);
+                    }else if(FilenameUtils.getExtension(url.getPath()).equals("tgz")){
+                        extractTarball(file.toPath().toString(), cloneLocation + uuid);
+                    }
                     if(file.exists()) {
                         deleteDirectory(file);
                     }
@@ -141,7 +175,7 @@ public class FileUtil {
     
     
     
-    public static void extractFolder(String zipFile,String extractFolder) 
+    public static void extractZipFolder(String zipFile,String extractFolder) 
     {
         try
         {
@@ -196,6 +230,63 @@ public class FileUtil {
         catch (Exception e) 
         {
             e.printStackTrace();
+        }
+
+    }
+    // https://stackoverflow.com/questions/11431143/how-to-untar-a-tar-file-using-apache-commons
+    
+    public static void extractTarball(String tarfile,String toPath) throws FileNotFoundException{
+        
+        File tarFile = FileSystems.getDefault().getPath(tarfile).toFile();
+        File dest = FileSystems.getDefault().getPath(toPath).toFile();
+        
+        dest.mkdir();
+        try{
+            TarArchiveInputStream tarIn = null;
+
+            tarIn = new TarArchiveInputStream(
+                        new GzipCompressorInputStream(
+                            new BufferedInputStream(
+                                new FileInputStream(
+                                    tarFile
+                                )
+                            )
+                        )
+                    );
+
+            TarArchiveEntry tarEntry = tarIn.getNextTarEntry();
+            // tarIn is a TarArchiveInputStream
+            while (tarEntry != null) {// create a file with the same name as the tarEntry
+                File destPath = new File(dest, tarEntry.getName());
+                if (tarEntry.isDirectory()) {
+                    destPath.mkdirs();
+                } else {
+                    if (!destPath.getParentFile().exists()) {                     
+                        destPath.getParentFile().mkdirs(); 
+                    }                
+                    destPath.createNewFile();
+                    //byte [] btoRead = new byte[(int)tarEntry.getSize()];
+                    byte [] btoRead = new byte[1024];
+                    //FileInputStream fin 
+                    //  = new FileInputStream(destPath.getCanonicalPath());
+                    BufferedOutputStream bout = 
+                        new BufferedOutputStream(new FileOutputStream(destPath));
+                    int len = 0;
+
+                    while((len = tarIn.read(btoRead)) != -1)
+                    {
+                        bout.write(btoRead,0,len);
+                    }
+
+                    bout.close();
+                    btoRead = null;
+
+                }
+                tarEntry = tarIn.getNextTarEntry();
+            }
+            tarIn.close();
+        }catch(IOException e){
+            System.out.println("Failed to untar file " + tarfile);
         }
 
     }
