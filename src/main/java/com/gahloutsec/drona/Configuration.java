@@ -2,7 +2,6 @@
 
 package com.gahloutsec.drona;
 
-import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,7 +13,7 @@ import java.nio.file.Paths;
 public class Configuration implements ConfigurationInterface{
     
     private Path basePath;
-    
+    private String licenseDataURL;
     private static Configuration _instance = null;
     private final Path cloneLocation = FileSystems.getDefault().getPath(".").resolve(".drona/temp/remote_clones/");
     
@@ -22,6 +21,9 @@ public class Configuration implements ConfigurationInterface{
         if(!cloneLocation.toFile().exists()){
             cloneLocation.toFile().mkdirs();
         }
+        
+        // Read all these configurations from the configuration.json file
+        licenseDataURL = "https://spdx.org/licenses/";
     }
     
     public static Configuration getConfiguration() {
@@ -40,7 +42,7 @@ public class Configuration implements ConfigurationInterface{
 
     @Override
     public void setBasePath(String p) {
-        this.basePath = Paths.get(p);
+        this.basePath = FileSystems.getDefault().getPath(p);
     }
 
     @Override
@@ -52,5 +54,10 @@ public class Configuration implements ConfigurationInterface{
     public Path getCloneLocation() {
         return cloneLocation;
     }
+
+    public String getLicenseDataURL() {
+        return licenseDataURL;
+    }
+    
     
 }
