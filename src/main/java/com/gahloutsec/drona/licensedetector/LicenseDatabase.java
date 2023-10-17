@@ -4,13 +4,24 @@ package com.gahloutsec.drona.licensedetector;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gahloutsec.drona.Configuration;
+import com.gahloutsec.drona.Utils.FileUtil;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -70,8 +81,8 @@ public class LicenseDatabase {
     
     private LSH lsh;
     
-    private final String pathToLicenseListJSON = "/json_data/licenses.json";
-    private final String pathToLicenseDetailsDirJSON = "/json_data/details/";
+    private String pathToLicenseListJSON = "/json_data/licenses.json";
+    private String pathToLicenseDetailsDirJSON = "/json_data/details/";
     
     public LicenseDatabase() {
         licenseTexts = new HashMap<>();
@@ -82,10 +93,33 @@ public class LicenseDatabase {
         lsh = new LSH();
         //docfreqs = new ArrayList<>();
         minimumLicenseTextLength = 0;
+        
+        /*
+            Download the license list data from the spdx repo
+        */
+        
+        downloadLicenseListData();
+    }
+    
+    private void downloadLicenseListData(){
+        System.out.println("Getting license data from the SPDX Repository");
+        Path pathToLicenseList = Configuration.getConfiguration().getCloneLocation().resolve("licenses.json");
+        String urlToLicenseData = Configuration.getConfiguration().getLicenseDataURL() + "licenses.json";
+        try {
+            FileUtils.copyURLToFile(new URL(urlToLicenseData), pathToLicenseList.toFile());
+            pathToLicenseListJSON = pathToLicenseList.toString();
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(LicenseDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(LicenseDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        System.out.println("License data downloaded at "+pathToLicenseListJSON.toString());
     }
     
     private void loadURLs() {
-        try(InputStream in = LicenseDatabase.class.getResourceAsStream(pathToLicenseListJSON)){
+        try(FileInputStream in = new FileInputStream(new File(pathToLicenseListJSON))){
             ObjectMapper mapper = new ObjectMapper();
             JsonNode jsonNode = mapper.readTree(in);
             JsonNode licenses = jsonNode.get("licenses");
@@ -113,7 +147,7 @@ public class LicenseDatabase {
     }
     
     private void loadNames() {
-        try(InputStream in = LicenseDatabase.class.getResourceAsStream(pathToLicenseListJSON)){
+        try(FileInputStream in = new FileInputStream(new File(pathToLicenseListJSON))){
             ObjectMapper mapper = new ObjectMapper();
             JsonNode jsonNode = mapper.readTree(in);
             JsonNode licenses = jsonNode.get("licenses");
@@ -148,9 +182,22 @@ public class LicenseDatabase {
         while(it.hasNext()) {
             Map.Entry<String,String> pair = (Map.Entry) it.next();
             String id = (String) pair.getKey();
-            String pathToLicenseDetail = pathToLicenseDetailsDirJSON + id + ".json";
+            String urlToDetail = Configuration.getConfiguration().getLicenseDataURL() + id + ".json";
+            Path pathToLicenseDetailPath = Configuration.getConfiguration().getCloneLocation().resolve(id+".json");
+            String pathToLicenseDetail = null;
+            try {
+                FileUtils.copyURLToFile(new URL(urlToDetail), pathToLicenseDetailPath.toFile());
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(LicenseDatabase.class.getName()).log(Level.SEVERE, "Failed to get details of license", ex);
+                pathToLicenseDetail = pathToLicenseDetailsDirJSON + id + ".json";
+            } catch (IOException ex) {
+                Logger.getLogger(LicenseDatabase.class.getName()).log(Level.SEVERE, "Failed to get details of license", ex);
+                pathToLicenseDetail = pathToLicenseDetailsDirJSON + id + ".json";
+            }
             
-            try(InputStream in = LicenseDatabase.class.getResourceAsStream(pathToLicenseDetail)){
+            pathToLicenseDetail = pathToLicenseDetailPath.toString();
+            
+            try(FileInputStream in = new FileInputStream(new File(pathToLicenseDetail))){
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode jsonNode = mapper.readTree(in);
                 String normLicenseText = Normalizer.normalize(jsonNode.get("licenseText").asText("null"));

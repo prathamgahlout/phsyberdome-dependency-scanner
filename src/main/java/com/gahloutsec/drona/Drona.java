@@ -20,7 +20,7 @@ public class Drona {
         
         
         Configuration configuration = Configuration.getConfiguration();
-        configuration.setBasePath("");
+        configuration.setBasePath(".");
         DependencyExcavator excavator = new DependencyExcavator();
         
         DependencyScanResult result = excavator.excavate();

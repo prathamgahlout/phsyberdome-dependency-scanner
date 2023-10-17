@@ -105,7 +105,9 @@ public class NodePackageManagerPlugin implements PluginInterface{
             Map.Entry<String,JsonNode> field = iter.next();
             String pkgName = field.getKey();
             String _pkgVersion = field.getValue().asText();
+            System.out.println(pkgName + " version before resolution "+_pkgVersion);
             String pkgVersion = pinpointPackageVersion(pkgName, _pkgVersion);
+            System.out.println(pkgName + " version after resolution "+pkgVersion);
             Module m = new Module(pkgName, pkgVersion);
 //            Map.Entry<String,JsonNode> field = iter.next();
 //            String pkgName = field.getKey();
@@ -116,7 +118,7 @@ public class NodePackageManagerPlugin implements PluginInterface{
             //if(!modulePath.toFile().exists()){
                 // Dependencies are not yet installed
                 String registryUrl = buildNpmRegistryUrl(pkgName, pkgVersion);
-                if(registryUrl == null) continue;
+                if(registryUrl == null || registryUrl.isBlank()) continue;
                 Path modulePath = FileUtil.getFilePathFromURL(registryUrl, Configuration.getConfiguration().getCloneLocation().toString());
             //}
             Pair<String,String> detectionResult = licenseDetector.detect(modulePath.toString());
@@ -237,7 +239,7 @@ public class NodePackageManagerPlugin implements PluginInterface{
         } catch (MalformedURLException ex) {
             Logger.getLogger(NodePackageManagerPlugin.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(NodePackageManagerPlugin.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NodePackageManagerPlugin.class.getName()).log(Level.SEVERE, "Failed to get tarball for "+ packageName, ex);
         }
         return null;
     }
@@ -265,7 +267,12 @@ public class NodePackageManagerPlugin implements PluginInterface{
              */
             return findVersionCompatibleWith(version.substring(1), allVersions);
         }else{
-            return version.substring(1);
+            try{
+                Integer.parseInt(version.substring(0,1));
+            }catch(NumberFormatException e){
+                return version.substring(1);
+            }
+            return version;
         }
     }
     

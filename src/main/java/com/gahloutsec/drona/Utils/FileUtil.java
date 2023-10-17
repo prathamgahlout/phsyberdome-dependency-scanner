@@ -90,7 +90,7 @@ public class FileUtil {
         if(validateRepository(path)){
                 try {
                     // is git URL?
-                    Path clonePath = FileSystems.getDefault().getPath(cloneLocation + FilenameUtils.getName(path));
+                    Path clonePath = FileSystems.getDefault().getPath(cloneLocation).resolve(FilenameUtils.getName(path));
                     if(clonePath.toFile().exists()) {
                         deleteDirectory(clonePath.toFile());
                     }
@@ -112,22 +112,23 @@ public class FileUtil {
                 try {
                     URL url = new URL(path);  
                     
-                    File file = FileSystems.getDefault().getPath(cloneLocation + FilenameUtils.getName(url.getPath())).toFile();
+                    File file = FileSystems.getDefault().getPath(cloneLocation).resolve(FilenameUtils.getName(url.getPath())).toFile();
                     if(file.exists()) {
                         deleteDirectory(file);
                     }
                     FileUtils.copyURLToFile(url, file);
                     String uuid = UUID.randomUUID().toString();
+                    Path dest = Paths.get(cloneLocation).resolve(uuid);
                     if(FilenameUtils.getExtension(url.getPath()).equals("zip")||FilenameUtils.getExtension(url.getPath()).equals("jar")){
-                        extractZipFolder(file.toPath().toString(), cloneLocation + uuid);
+                        extractZipFolder(file.toPath().toString(), dest.toString());
                     }else if(FilenameUtils.getExtension(url.getPath()).equals("tgz")){
-                        extractTarball(file.toPath().toString(), cloneLocation + uuid);
+                        extractTarball(file.toPath().toString(), dest.toString());
                     }
                     if(file.exists()) {
                         deleteDirectory(file);
                     }
                     
-                    return Paths.get(cloneLocation + uuid);
+                    return dest;
                 }catch(MalformedURLException ex){
                     System.out.println("MalformedURLException for URL: "+path);
                 }
@@ -306,7 +307,7 @@ public class FileUtil {
     }
     
     public static void cleanup(){
-        String loc = "/.drona/";
+        String loc = "./.drona/";
         File file = FileSystems.getDefault().getPath(loc).toFile();
         deleteDirectory(file);
     }
