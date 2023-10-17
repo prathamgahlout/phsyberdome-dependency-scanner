@@ -16,10 +16,12 @@ public class Configuration implements ConfigurationInterface{
     private Path basePath;
     
     private static Configuration _instance = null;
-    private final String cloneLocation = "/.drona/temp/remote_clones/";
+    private final Path cloneLocation = FileSystems.getDefault().getPath(".").resolve("/.drona/temp/remote_clones/");
     
     private Configuration(){
-        
+        if(!cloneLocation.toFile().exists()){
+            cloneLocation.toFile().mkdirs();
+        }
     }
     
     public static Configuration getConfiguration() {
@@ -46,7 +48,8 @@ public class Configuration implements ConfigurationInterface{
         this.basePath = path;
     }
     
-    public String getCloneLocation() {
+    @Override
+    public Path getCloneLocation() {
         return cloneLocation;
     }
     

@@ -23,6 +23,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -116,7 +118,7 @@ public class FileUtil {
                     }
                     FileUtils.copyURLToFile(url, file);
                     String uuid = UUID.randomUUID().toString();
-                    if(FilenameUtils.getExtension(url.getPath()).equals("zip")){
+                    if(FilenameUtils.getExtension(url.getPath()).equals("zip")||FilenameUtils.getExtension(url.getPath()).equals("jar")){
                         extractZipFolder(file.toPath().toString(), cloneLocation + uuid);
                     }else if(FilenameUtils.getExtension(url.getPath()).equals("tgz")){
                         extractTarball(file.toPath().toString(), cloneLocation + uuid);
@@ -173,7 +175,19 @@ public class FileUtil {
         return directoryToBeDeleted.delete();
     }
     
-    
+    public static String readFile(Path filePath) {
+        // If it is plain text file
+        try {
+            String text;
+            try (Stream<String> content = Files.lines(filePath)) {
+                text = content.collect(Collectors.joining("\n"));
+            }
+            return text;
+        } catch (IOException ex) {
+            Logger.getLogger(LicenseDetector.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
     
     public static void extractZipFolder(String zipFile,String extractFolder) 
     {

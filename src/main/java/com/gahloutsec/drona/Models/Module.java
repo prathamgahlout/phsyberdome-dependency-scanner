@@ -12,8 +12,10 @@ public class Module {
     private String name;
     private String version;
     private String license;
+    private String analyzedContent;
     private String supplier;
     private ArrayList<Module> dependencies;
+    private String dependencyType;
 
     public Module(String name, String version) {
         this.name = name;
@@ -21,6 +23,7 @@ public class Module {
         dependencies = new ArrayList<>();
         this.license = "null";
         this.supplier = "null";
+        this.analyzedContent = "null";
     }
 
     public Module(String name, String version, ArrayList<Module> dependencies) {
@@ -65,7 +68,16 @@ public class Module {
     public void setSupplier(String supplier) {
         this.supplier = supplier;
     }
+
+    public String getAnalyzedContent() {
+        return analyzedContent;
+    }
+
+    public void setAnalyzedContent(String analyzedContent) {
+        this.analyzedContent = analyzedContent;
+    }
         
+    
     
     
 }

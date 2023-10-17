@@ -2,26 +2,15 @@
 
 package com.gahloutsec.drona.licensedetector;
 
+import com.gahloutsec.drona.Configuration;
+import com.gahloutsec.drona.Models.Pair;
 import com.gahloutsec.drona.Utils.FileUtil;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 /**
  *
@@ -39,8 +28,11 @@ public class LicenseDetector {
             "LICENSE.html","license.html","licence.html","LICENCE.html","LISENCE.html","lisence.html",
             "LICENSE-junit.txt"
         };
+    // TODO: Improve regex/Use 'i' flag for case insensitivity
+    String licenseFileRegex = "([Ll][Ii][CScs][Ee][Nn][CScs][Ee]([Ss]?)).*(\\.(txt|md|TXT|MD|html|HTML))?";
+    String readMeFileRegex = "(?i)(readme|guide)(\\.(txt|md|TXT|MD|html|HTML))?";
     
-    private final String cloneLocation = "/.drona/temp/remote_clones/";
+    private final String cloneLocation = Configuration.getConfiguration().getCloneLocation().toString();
 
     public LicenseDetector() {
         this.db = new LicenseDatabase();
@@ -53,28 +45,31 @@ public class LicenseDetector {
     private Path searchLicenseFile(String rootString) {
         Path root = Paths.get(rootString);
         
-        for(String name:variationsInNames){
-            File file = FileUtil.searchFile(root.toFile(), name);
-            if(file != null) {
+        //for(String name:[]){
+            File file = FileUtil.searchFile(root.toFile(), licenseFileRegex);
+              if(file != null) {
                 return file.toPath();
             }
-        }
+        //}
         // Search the README for data
+        return null;
+    }
+    
+    private Path searchReadmeFile(String rootString){
+        Path root = Paths.get(rootString);
+        
+        //for(String name:[]){
+            File file = FileUtil.searchFile(root.toFile(), readMeFileRegex);
+              if(file != null) {
+                return file.toPath();
+            }
+        //}
         return null;
     }
     
     private String readLicense(Path licensePath) {
         // If it is plain text file
-        try {
-            String licenseText;
-            try (Stream<String> content = Files.lines(licensePath)) {
-                licenseText = content.collect(Collectors.joining("\n"));
-            }
-            return licenseText;
-        } catch (IOException ex) {
-            Logger.getLogger(LicenseDetector.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
+        return FileUtil.readFile(licensePath);
     }
     
     private Map<String,Double> analyze(String licenseContent) {
@@ -96,13 +91,13 @@ public class LicenseDetector {
         return queryResult;
     }
    
-    public String detect(String path){
+    public Pair<String,String> detect(String path){
         // Check if it is valid url
         
         if(isValidURL(path)){
             
             Path rootPath = FileUtil.getFilePathFromURL(path,cloneLocation);
-            String result = filePathDetection(rootPath.toString());
+            Pair<String,String> result = filePathDetection(rootPath.toString());
             if(rootPath.toFile().exists()){
                 FileUtil.deleteDirectory(rootPath.toFile());
             }
@@ -114,22 +109,30 @@ public class LicenseDetector {
     }
     
     
-    private String filePathDetection(String path) {
+    private Pair<String,String> filePathDetection(String path) {
         Path pathToFile = searchLicenseFile(path);
-            if(pathToFile == null) {
-                System.out.println("Couldn't get license file at "+path);
-                totalRogues++;
-                return "null";
+        totalScanned++;
+        if(pathToFile == null) {
+            System.out.println("Couldn't get license file at "+path);
+            totalRogues++;
+            // Do some investigation on README?
+            // Maybe handover this responsiblity to the cloud service.
+            pathToFile = searchReadmeFile(path);
+            if(pathToFile == null){
+                return new Pair<>("null","null");
             }
-            totalScanned++;
-            String content = readLicense(pathToFile);
-        
-            Map<String,Double> res = analyze(content);
-            if(res.isEmpty()) {
-                return "null";
-            }else{
-                return res.entrySet().iterator().next().getKey();
-            }
+            String content = FileUtil.readFile(pathToFile);
+            return new Pair<>("null",content);
+        }
+
+        String content = readLicense(pathToFile);
+
+        Map<String,Double> res = analyze(content);
+        if(res.isEmpty()) {
+            return new Pair<>("null","null");
+        }else{
+            return new Pair<>(res.entrySet().iterator().next().getKey(),content);
+        }
     }
     
     

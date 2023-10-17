@@ -8,6 +8,7 @@ import com.gahloutsec.drona.PluginInterface;
 import com.gahloutsec.drona.Models.Dependencies;
 import com.gahloutsec.drona.Models.Module;
 import com.gahloutsec.drona.Models.DependencyManager;
+import com.gahloutsec.drona.Models.Pair;
 import com.gahloutsec.drona.SysRunner;
 import com.gahloutsec.drona.Utils.FileUtil;
 import com.gahloutsec.drona.Utils.JSONHelper;
@@ -116,10 +117,12 @@ public class NodePackageManagerPlugin implements PluginInterface{
                 // Dependencies are not yet installed
                 String registryUrl = buildNpmRegistryUrl(pkgName, pkgVersion);
                 if(registryUrl == null) continue;
-                Path modulePath = FileUtil.getFilePathFromURL(registryUrl, Configuration.getConfiguration().getCloneLocation());
+                Path modulePath = FileUtil.getFilePathFromURL(registryUrl, Configuration.getConfiguration().getCloneLocation().toString());
             //}
-            String license = getLicenseOfModule(modulePath);
+            Pair<String,String> detectionResult = licenseDetector.detect(modulePath.toString());
+            String license = detectionResult.first;
             m.setLicense(license);
+            m.setAnalyzedContent(detectionResult.second);
             resolveTransitiveDependencies(m,modulePath);
 //            if(body.get("dependencies") != null) {
 //                ArrayList<Module> deps_t = resolveTransitiveDependencies(body.get("dependencies"));
@@ -210,7 +213,7 @@ public class NodePackageManagerPlugin implements PluginInterface{
     }
     
     private String getLicenseOfModule(Path path) {
-        return licenseDetector.detect(path.toString());
+        return licenseDetector.detect(path.toString()).first;
     }
 
     @Override
