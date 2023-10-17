@@ -90,7 +90,7 @@ public class FileUtil {
         if(validateRepository(path)){
                 try {
                     // is git URL?
-                    Path clonePath = FileSystems.getDefault().getPath(cloneLocation + path.split("//")[1]);
+                    Path clonePath = FileSystems.getDefault().getPath(cloneLocation + FilenameUtils.getName(path));
                     if(clonePath.toFile().exists()) {
                         deleteDirectory(clonePath.toFile());
                     }
