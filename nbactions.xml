@@ -15,7 +15,7 @@
                 <exec.appArgs></exec.appArgs>
                 <exec.mainClass>com.gahloutsec.drona.Drona</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>C:\Users\pgahl\OneDrive\Desktop\ProjectD-SCA\Drona</exec.workingdir>
+                <exec.workingdir>C:\Users\pgahl\OneDrive\Desktop\landing-page\FirstPage</exec.workingdir>
                 
             </properties>
         </action>
@@ -35,7 +35,7 @@
                 <exec.mainClass>com.gahloutsec.drona.Drona</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
-                <exec.workingdir>C:\Users\pgahl\OneDrive\Desktop\ProjectD-SCA\Drona</exec.workingdir>
+                <exec.workingdir>C:\Users\pgahl\OneDrive\Desktop\landing-page\FirstPage</exec.workingdir>
                 
             </properties>
         </action>
@@ -53,7 +53,7 @@
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.mainClass>com.gahloutsec.drona.Drona</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>C:\Users\pgahl\OneDrive\Desktop\ProjectD-SCA\Drona</exec.workingdir>
+                <exec.workingdir>C:\Users\pgahl\OneDrive\Desktop\landing-page\FirstPage</exec.workingdir>
                 <exec.appArgs></exec.appArgs>
             </properties>
         </action>
