@@ -67,6 +67,14 @@ public class FileUtil {
         return null;
     }
     
+    public static boolean  verifyIfDirectoryExists(String path){
+        Path srcPath = Paths.get(path);
+        if(srcPath!=null && srcPath.toFile()!=null && srcPath.toFile().exists()){
+            return true;
+        }
+        return false;
+    }
+    
     private static void sortListOfFilesToKeepDirectoriesAtEnd(File[] arr){
         Arrays.sort(arr, new Comparator<File>(){
             @Override

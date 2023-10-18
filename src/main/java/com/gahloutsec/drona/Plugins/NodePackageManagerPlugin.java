@@ -64,7 +64,7 @@ public class NodePackageManagerPlugin implements PluginInterface{
         String pm_version = SysRunner.run(CMD_VERSION);
         pm = new DependencyManager("npm",pm_version);
         // Read the package-lock.json
-        File file = FileUtil.searchFile(FileSystems.getDefault().getPath(".").toFile(), "package.json");
+        File file = FileUtil.searchFile(Configuration.getConfiguration().getBasePath().toFile(), "package.json");
         if(file==null){
             System.out.println("Couldn't find package.json");
             return;
