@@ -1,12 +1,17 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
 - develop
 - feature/*
 - main
+- bugfix/*
+
+variables:
+- name: mavenoptions
+  ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'),eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}:
+    value: '-DskipTests=false'
+  ${{ else }}:
+    value: '-DskipTests=true'
+    
 
 pool:
   vmImage: ubuntu-latest
@@ -22,3 +27,4 @@ steps:
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
+    options: $(mavenoptions)
