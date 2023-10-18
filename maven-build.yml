@@ -8,9 +8,9 @@ trigger:
 variables:
 - name: mavenoptions
   ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'),eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}:
-    value: DskipTests=false
+    value: '-DskipTests=false'
   ${{ else }}:
-    value: DskipTests=true
+    value: '-DskipTests=true'
     
 
 pool:
