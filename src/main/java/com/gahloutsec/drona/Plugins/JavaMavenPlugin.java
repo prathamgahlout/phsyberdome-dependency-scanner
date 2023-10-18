@@ -57,7 +57,7 @@ public class JavaMavenPlugin implements PluginInterface
         pm = new DependencyManager("java-maven","null");
         
         //Read the pom.xml
-        File file = FileUtil.searchFile(FileSystems.getDefault().getPath(".").toFile(), "(.*\\.(pom|POM))|(pom\\.(xml|XML))");
+        File file = FileUtil.searchFile(Configuration.getConfiguration().getBasePath().toFile(), "(.*\\.(pom|POM))|(pom\\.(xml|XML))");
         if(file == null) {
             System.out.println("pom file not found in project");
             
