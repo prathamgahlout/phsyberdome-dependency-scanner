@@ -12,6 +12,8 @@ import com.gahloutsec.drona.Models.Pair;
 import com.gahloutsec.drona.SysRunner;
 import com.gahloutsec.drona.Utils.FileUtil;
 import com.gahloutsec.drona.Utils.JSONHelper;
+import com.gahloutsec.drona.Utils.NPMVersionHelper;
+import com.gahloutsec.drona.Utils.NPMVersionHelperV2;
 import com.gahloutsec.drona.licensedetector.LicenseDetector;
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,9 +27,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.eclipse.jgit.util.StringUtils;
@@ -44,11 +48,14 @@ public class NodePackageManagerPlugin implements PluginInterface{
     
     private DependencyManager pm;
     
+    private Set<Module> scannedDependencies;
+    
     private Dependencies modules;
     private LicenseDetector licenseDetector;
 
     public NodePackageManagerPlugin(LicenseDetector licenseDetector) {
         this.licenseDetector = licenseDetector;
+        scannedDependencies = new HashSet<>();
     }
     
     
@@ -63,32 +70,95 @@ public class NodePackageManagerPlugin implements PluginInterface{
         modules = new Dependencies();
         String pm_version = SysRunner.run(CMD_VERSION);
         pm = new DependencyManager("npm",pm_version);
-        // Read the package-lock.json
-        File file = FileUtil.searchFile(Configuration.getConfiguration().getBasePath().toFile(), "package.json");
-        if(file==null){
-            System.out.println("Couldn't find package.json");
-            return;
-        }
-        Path path = file.toPath();
-        //Path path = Configuration.getConfiguration().getBasePath().resolve("package-lock.json");
-        if(path.toFile().exists()){
+        
+        File pkgLockFile = FileUtil.searchFile(Configuration.getConfiguration().getBasePath().toFile(), "package-lock.json");
+        
+        if(pkgLockFile!=null && pkgLockFile.exists()){
+            // Read the package-lock.json
             ObjectMapper mapper = new ObjectMapper();
-            JsonNode node = mapper.createObjectNode() ;
-            try {
-                node = mapper.readTree(path.toFile());    
+            JsonNode node = mapper.createObjectNode();
+            try{
+                node = mapper.readTree(pkgLockFile);
                 String name = node.get("name").asText("null");
                 String version = node.get("version").asText("null");
                 Module root = new Module(name,version);
-                getRootModuleWithDependencies(root,node);
-            } catch (IOException ex) {
-                Logger.getLogger(NodePackageManagerPlugin.class.getName()).log(Level.SEVERE, null, ex);
-                return;
+                scannedDependencies.add(root);
+                getRootModuleWithDependenciesFromLockFile(root, node);
+            }catch(IOException e){
+                Logger.getLogger(NodePackageManagerPlugin.class.getName()).log(Level.SEVERE, null, e);
             }
             licenseDetector.printScanStats();
-        }else{
-            System.out.println("Project does not has npm as its package manager!");
+        }else {
+            // Read the package.json file and resolve the versions
+            File file = FileUtil.searchFile(Configuration.getConfiguration().getBasePath().toFile(), "package.json");
+            if(file==null){
+                System.out.println("Couldn't find package.json");
+                return;
+            }
+            Path path = file.toPath();
+            //Path path = Configuration.getConfiguration().getBasePath().resolve("package-lock.json");
+            if(path.toFile().exists()){
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode node = mapper.createObjectNode() ;
+                try {
+                    node = mapper.readTree(path.toFile());    
+                    String name = node.get("name").asText("null");
+                    String version = node.get("version").asText("null");
+                    Module root = new Module(name,version);
+                    scannedDependencies.add(root);
+                    getRootModuleWithDependencies(root,node);
+                    modules.addToDependencies(root);
+                } catch (IOException ex) {
+                    Logger.getLogger(NodePackageManagerPlugin.class.getName()).log(Level.SEVERE, null, ex);
+                    return;
+                }
+                licenseDetector.printScanStats();
+            }else{
+                System.out.println("Project does not has npm as its package manager!");
+            }
         }
         
+    }
+    
+    private void getRootModuleWithDependenciesFromLockFile(Module root,JsonNode node){
+        JsonNode deps = node.get("dependencies");
+        if(deps==null){
+            System.out.println("No dependenices for module "+root.getName());
+            return;
+        }
+        Iterator<Map.Entry<String,JsonNode>> iter = deps.fields();
+        while(iter.hasNext()) {
+            Map.Entry<String,JsonNode> field = iter.next();
+            String pkgName = field.getKey();
+            JsonNode body = field.getValue();
+            String pkgVersion = body.get("version").asText("null");
+            Module m = new Module(pkgName, pkgVersion);
+            if(alreadyScanned(m)){
+                Logger.getLogger(NodePackageManagerPlugin.class.getName()).log(Level.INFO, "Dependency "+pkgName+" already scanned");
+                root.addToDependencies(getScannedModule(m));
+                continue;
+            }
+            Path modulePath = Configuration.getConfiguration().getBasePath().resolve("node_modules/" + pkgName);
+            if(!modulePath.toFile().exists()){
+                String registryUrl = buildNpmRegistryUrl(pkgName, pkgVersion);
+                if(registryUrl == null || registryUrl.isBlank()) continue;
+                modulePath = FileUtil.getFilePathFromURL(registryUrl, Configuration.getConfiguration().getCloneLocation().toString());
+            }
+            
+            Pair<String,String> detectionResult = licenseDetector.detect(modulePath.toString());
+            String license = detectionResult.first;
+            m.setLicense(license);
+            m.setAnalyzedContent(detectionResult.second);
+            JsonNode dependencies = body.get("dependencies");
+            if(dependencies!=null){
+                resolveTransitiveDependencies(m,dependencies);
+            }else{
+                System.out.println("No dependencies for module "+m.getName());
+            }
+            scannedDependencies.add(m);
+            root.addToDependencies(m);
+        }
+        modules.addToDependencies(root);
     }
     
     private void getRootModuleWithDependencies(Module root,JsonNode node) {
@@ -106,9 +176,14 @@ public class NodePackageManagerPlugin implements PluginInterface{
             String pkgName = field.getKey();
             String _pkgVersion = field.getValue().asText();
             System.out.println(pkgName + " version before resolution "+_pkgVersion);
-            String pkgVersion = pinpointPackageVersion(pkgName, _pkgVersion);
+            String pkgVersion = NPMVersionHelperV2.pinpointPackageVersion(pkgName, _pkgVersion);
             System.out.println(pkgName + " version after resolution "+pkgVersion);
             Module m = new Module(pkgName, pkgVersion);
+            if(alreadyScanned(m)){
+                Logger.getLogger(NodePackageManagerPlugin.class.getName()).log(Level.INFO, "Dependency "+pkgName+" already scanned");
+                root.addToDependencies(getScannedModule(m));
+                continue;
+            }
 //            Map.Entry<String,JsonNode> field = iter.next();
 //            String pkgName = field.getKey();
 //            JsonNode body = field.getValue();
@@ -126,6 +201,7 @@ public class NodePackageManagerPlugin implements PluginInterface{
             m.setLicense(license);
             m.setAnalyzedContent(detectionResult.second);
             resolveTransitiveDependencies(m,modulePath);
+            scannedDependencies.add(m);
 //            if(body.get("dependencies") != null) {
 //                ArrayList<Module> deps_t = resolveTransitiveDependencies(body.get("dependencies"));
 //                m.setDependencies(deps_t);
@@ -133,35 +209,41 @@ public class NodePackageManagerPlugin implements PluginInterface{
             root.addToDependencies(m);
         }
         
-        modules.addToDependencies(root);
+       
     }
     
-//    private ArrayList<Module> resolveTransitiveDependencies(JsonNode node) {
-//        ArrayList<Module> deps = new ArrayList<>();
-//        Iterator<Map.Entry<String,JsonNode>> iter = node.fields();
-//        while(iter.hasNext()) {
-//            Map.Entry<String,JsonNode> field = iter.next();
-//            String pkgName = field.getKey();
-//            JsonNode body = field.getValue();
-//            String pkgVersion = body.get("version").asText("null");
-//            Module m = new Module(pkgName, pkgVersion);
-//            //Path modulePath = Configuration.getConfiguration().getBasePath().resolve("node_modules/" + pkgName);
-//            //if(!modulePath.toFile().exists()){
-//                // Dependencies are not yet installed
-//                String registryUrl = buildNpmRegistryUrl(pkgName, pkgVersion);
-//                if(registryUrl == null) continue;
-//                Path modulePath = FileUtil.getFilePathFromURL(registryUrl, Configuration.getConfiguration().getCloneLocation());
-//            //}
-//            String license = getLicenseOfModule(modulePath);
-//            m.setLicense(license);
-//            if(body.get("dependencies") != null) {
-//                ArrayList<Module> deps_t = resolveTransitiveDependencies(body.get("dependencies"));
-//                m.setDependencies(deps_t);
-//            }
-//            deps.add(m);
-//        }
-//        return deps;
-//    }
+    private void resolveTransitiveDependencies(Module root,JsonNode node) {
+        Iterator<Map.Entry<String,JsonNode>> iter = node.fields();
+        while(iter.hasNext()) {
+            Map.Entry<String,JsonNode> field = iter.next();
+            String pkgName = field.getKey();
+            JsonNode body = field.getValue();
+            String pkgVersion = body.get("version").asText("null");
+            Module m = new Module(pkgName, pkgVersion);
+            if(alreadyScanned(m)){
+                Logger.getLogger(NodePackageManagerPlugin.class.getName()).log(Level.INFO, "Dependency "+pkgName+" already scanned");
+                root.addToDependencies(getScannedModule(m));
+                continue;
+            }
+            Path modulePath = Configuration.getConfiguration().getBasePath().resolve("node_modules/" + pkgName);
+            if(!modulePath.toFile().exists()){
+                String registryUrl = buildNpmRegistryUrl(pkgName, pkgVersion);
+                if(registryUrl == null || registryUrl.isBlank()) continue;
+                modulePath = FileUtil.getFilePathFromURL(registryUrl, Configuration.getConfiguration().getCloneLocation().toString());
+            }
+            Pair<String,String> detectionResult = licenseDetector.detect(modulePath.toString());
+            String license = detectionResult.first;
+            m.setLicense(license);
+            m.setAnalyzedContent(detectionResult.second);
+            JsonNode dependencies = body.get("dependencies");
+            if(dependencies != null) {
+                resolveTransitiveDependencies(m,dependencies);
+            }else{
+                System.out.println("No dependencies for module "+m.getName());
+            }
+            root.addToDependencies(m);
+        }
+    }
     
     private void resolveTransitiveDependencies(Module root,Path modulePath){
         File file = FileUtil.searchFile(modulePath.toFile(), "package.json");
@@ -243,128 +325,26 @@ public class NodePackageManagerPlugin implements PluginInterface{
         }
         return null;
     }
-    
-    private String pinpointPackageVersion(String name,String version){
-        if(version==null || version.length()<0){
-            return null;
-        }
-        char first_char = version.charAt(0);
-        List<String> allVersions = fetchAllVersions(name);
-        
-        // TODO: Support all methods of version specificity
-        if(first_char == '~'){
-            /*
-            *   ~version “Approximately equivalent to version”, will update you to all future patch versions, 
-            *   without incrementing the minor version. ~1.2.3 will use releases from 1.2.3 to <1.3.0.
-            */
-            String v = findApproximatelyEquivalentVersion(version.substring(1), allVersions);
-            System.out.println("patch version for "+name+" is "+v);
-            return v;
-        }else if(first_char == '^'){
-             /*
-             *  ^version “Compatible with version”, will update you to all future minor/patch versions, 
-             *  without incrementing the major version. ^1.2.3 will use releases from 1.2.3 to <2.0.0.
-             */
-            return findVersionCompatibleWith(version.substring(1), allVersions);
-        }else{
-            try{
-                Integer.parseInt(version.substring(0,1));
-            }catch(NumberFormatException e){
-                return version.substring(1);
+   
+    private boolean alreadyScanned(Module m){
+        Iterator it = scannedDependencies.iterator();
+        while(it.hasNext()){
+            Module a = (Module) it.next();
+            if(a.getName()==m.getName() && a.getVersion() == m.getVersion()){
+                return true;
             }
-            return version;
         }
+        return false;
     }
     
-    private List<String> fetchAllVersions(String name){
-        
-        String repoUrl = "https://registry.npmjs.org/"+name;
-        StringBuilder temp = new StringBuilder();
-        try {
-            HttpURLConnection conn = (HttpURLConnection) new URL(repoUrl).openConnection();
-            conn.setRequestMethod("GET");
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            for (String line; (line = bufferedReader.readLine()) != null; ) {
-                temp.append(line);
-            }
-            return JSONHelper.getValues("/versions", temp.toString());
-            
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(NodePackageManagerPlugin.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(NodePackageManagerPlugin.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-    
-    private String findApproximatelyEquivalentVersion(String version,List<String> allVersions){
-        // Get greatest patch version for current minor version
-        String currentMinor = version.substring(0,version.lastIndexOf('.'));
-        List<String> currentMinorVersions = new ArrayList<>();
-        for(String v:allVersions){
-            String thisMinor = v.substring(0,v.lastIndexOf('.'));
-            if(thisMinor.equals(currentMinor) && v.substring(v.lastIndexOf('.')+1).matches("\\d+(\\.\\d+)?")){
-                currentMinorVersions.add(v);
+    private Module getScannedModule(Module m){
+        Iterator it = scannedDependencies.iterator();
+        while(it.hasNext()){
+            Module a = (Module) it.next();
+            if(a.getName()==m.getName() && a.getVersion() == m.getVersion()){
+                return a;
             }
         }
-        
-        Collections.sort(currentMinorVersions, new Comparator<String>(){
-            @Override
-            public int compare(String o1, String o2) {
-                String patch1 = o1.substring(o1.lastIndexOf('.')+1);
-                String patch2 = o2.substring(o2.lastIndexOf('.')+1);
-                
-                Integer p1 = Integer.parseInt(patch1);
-                Integer p2 = Integer.parseInt(patch2);
-                
-                if(p1==p2){
-                    return 0;
-                }else if(p1<p2){
-                    return -1;
-                }else{
-                    return 1;
-                }
-            }
-            
-        });
-        
-        return currentMinorVersions.size()>0 ? currentMinorVersions.get(currentMinorVersions.size()-1) : version;
-    }
-    
-     private String findVersionCompatibleWith(String version,List<String> allVersions){
-        // Get greatest minor version for current major version
-        String currentMajor = version.substring(0,version.indexOf('.'));
-        List<String> currentMajorVersions = new ArrayList<>();
-        for(String v:allVersions){
-            String thisMinor = v.substring(0,version.indexOf('.'));
-            if(thisMinor.equals(currentMajor) && v.substring(v.indexOf('.')+1).matches("\\d+(\\.\\d+)?")){
-                currentMajorVersions.add(v);
-            }
-        }
-        
-        Collections.sort(currentMajorVersions, new Comparator<String>(){
-            @Override
-            public int compare(String o1, String o2) {
-                String _minor1 = o1.substring(o1.indexOf('.')+1);
-                String _minor2 = o2.substring(o2.indexOf('.')+1);
-                String minor1 = _minor1.substring(0,_minor1.indexOf('.'));
-                String minor2 = _minor2.substring(0,_minor2.indexOf('.'));
-                
-                Integer p1 = Integer.parseInt(minor1);
-                Integer p2 = Integer.parseInt(minor2);
-                
-                if(p1==p2){
-                    return 0;
-                }else if(p1<p2){
-                    return -1;
-                }else{
-                    return 1;
-                }
-            }
-            
-        });
-        
-        
-        return currentMajorVersions.size()>0 ? findApproximatelyEquivalentVersion(currentMajorVersions.get(0),allVersions) : version;
+        return m;
     }
 }
