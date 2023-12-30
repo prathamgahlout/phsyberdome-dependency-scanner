@@ -4,7 +4,7 @@ A command line tool written in Java to scan the dependencies of a project and de
 
 The tool scans the metadata file (e.g. pom.xml for maven based projects and package.json for npm) and creates a dependency tree by recursively resolving each dependency from respective repositories. The license (if found) is analyzed and matched with the licenses in the SPDX License Database using methods of NLP. The motivation for the algorithm of license detection is taken from [Link](https://github.com/go-enry/go-license-detector).
 
-[SAMPLE_IMAGE](./images/npm-scan-result.jpg)
+![SAMPLE_IMAGE](./images/npm-scan-result.jpg)
 
 ## TODO
 
