@@ -42,5 +42,5 @@ mvn -DskipTests package
 To scan a local project
 `java -jar <path-to-jar> scan -src <path-for-the-project-to-scan>`
 
-To scan a remote repository/package (zip/tarball)
+To scan a remote repository/package
 `java -jar <path-to-jar> monitor -src <path-for-the-project-to-scan>`
