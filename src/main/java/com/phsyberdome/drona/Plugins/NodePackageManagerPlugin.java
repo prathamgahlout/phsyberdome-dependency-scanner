@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.phsyberdome.drona.CLIHelper;
 import com.phsyberdome.drona.Configuration;
 import com.phsyberdome.drona.PluginInterface;
-import com.phsyberdome.drona.Models.Dependencies;
 import com.phsyberdome.drona.Models.Module;
 import com.phsyberdome.drona.Models.DependencyManager;
 import com.phsyberdome.drona.Models.Pair;

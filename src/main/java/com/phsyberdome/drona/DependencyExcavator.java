@@ -2,7 +2,6 @@
 
 package com.phsyberdome.drona;
 
-import com.phsyberdome.drona.Models.Dependencies;
 import com.phsyberdome.drona.Models.DependencyManager;
 import com.phsyberdome.drona.Models.DependencyScanResult;
 import com.phsyberdome.drona.Models.Module;

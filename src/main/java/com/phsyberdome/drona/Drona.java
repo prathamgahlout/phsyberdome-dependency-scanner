@@ -20,9 +20,7 @@ import org.fusesource.jansi.Ansi.Color;
  * @author pgahl
  */
 public class Drona {
-    
-    final static String kepler_server_url = "http://localhost:3000/api/kepler-22b/feed";
-        
+            
     public static void main(String[] args) {
         
         CLIHelper.initialize();
@@ -54,8 +52,9 @@ public class Drona {
 
             printResult(result);
             
-//            String response = NetworkHelper.postData(Configuration.getConfiguration().getAPIEndpoint() + "/kepler-22b/feed", s);
-            
+            /**
+             *  TODO: Send data to services for processing & show the processed information
+             */
 
             FileUtil.cleanup();
         }else if(mode.getMode() == MODE.MONITOR){
