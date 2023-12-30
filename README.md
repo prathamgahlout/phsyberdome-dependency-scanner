@@ -1,8 +1,7 @@
-<div style="text-align:center;">
+<div align="center">
     <img src='./images/logo.png'>
 </div>
 
-<br><br>
 
 # Phsyberdome Dependency Scanner And License Detector 
 
