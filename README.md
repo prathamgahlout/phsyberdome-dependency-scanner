@@ -1,3 +1,9 @@
+<div style="text-align:center; height:50px">
+    <img src='./images/logo.png'>
+</div>
+
+<br><br>
+
 # Phsyberdome Dependency Scanner And License Detector 
 
 A command line tool written in Java to scan the dependencies of a project and detect their Licenses. I wrote this while building an SCA Tool.
@@ -6,7 +12,6 @@ The tool scans the metadata file (e.g. pom.xml for maven based projects and pack
 
 ![SAMPLE_IMAGE](./images/npm-scan-result.jpg)
 
-## TODO
 
 ### Features
 
@@ -40,7 +45,17 @@ mvn -DskipTests package
 ## Usage
 
 To scan a local project
-`java -jar <path-to-jar> scan -src <path-for-the-project-to-scan>`
+```
+java -jar <path-to-jar> scan -src <path-for-the-project-to-scan>
+```
 
 To scan a remote repository/package
-`java -jar <path-to-jar> monitor -src <path-for-the-project-to-scan>`
+```
+java -jar <path-to-jar> monitor -src <path-for-the-project-to-scan>
+```
+
+## CONTRIBUTING
+
+Contributions are always welcome. Help me make this software bug free, robust and support more package managers.
+Please feel free to raise an issue and discuss.
+
