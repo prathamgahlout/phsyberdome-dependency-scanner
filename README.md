@@ -13,7 +13,6 @@ The tool scans the metadata file (e.g. pom.xml for maven based projects and pack
 - [X] License Detection through License files
 - [ ] License Detection through README files (If no License file is found in the package)
 - [X] Supports scanning remote public repo
-- [X] Support scanning a remote package (zip/tarball)
 - [ ] Export report as XML/JSON
 
 ### Supported package/project managers
