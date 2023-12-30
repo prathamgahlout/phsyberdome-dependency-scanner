@@ -6,6 +6,7 @@ import com.phsyberdome.drona.CLIHelper;
 import com.phsyberdome.drona.Configuration;
 import com.phsyberdome.drona.Models.Pair;
 import com.phsyberdome.drona.Utils.FileUtil;
+import com.phsyberdome.drona.Utils.NetworkHelper;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
@@ -96,7 +97,7 @@ public class LicenseDetector {
     public Pair<String,String> detect(String path){
         // Check if it is valid url
         
-        if(isValidURL(path)){
+        if(NetworkHelper.isValidURL(path)){
             
             Path rootPath = FileUtil.getFilePathFromURL(path,cloneLocation);
             Pair<String,String> result = filePathDetection(rootPath.toString());
@@ -146,15 +147,6 @@ public class LicenseDetector {
         CLIHelper.printDivider(Ansi.Color.YELLOW);
     }
     
-    private boolean isValidURL(String urlString) {
-        try{
-            URL url = new URL(urlString);
-            url.toURI();
-            return true;
-        }catch(Exception e){
-            return false;
-        }
-    }
     
     
     

@@ -10,6 +10,7 @@ import com.phsyberdome.drona.Models.RunMode;
 import com.phsyberdome.drona.Utils.FileUtil;
 import com.phsyberdome.drona.Utils.JSONHelper;
 import com.phsyberdome.drona.Utils.NetworkHelper;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,36 +36,56 @@ public class Drona {
         
         Configuration configuration = Configuration.getConfiguration();
         
-
-        if(mode.getMode() == MODE.SCAN){
-            printOrganizationalData();
-            if(mode.getTargetPath()!=null)
-                configuration.setBasePath(mode.getTargetPath());
-            // Else we scan the current dir only
-            else
-            {
-                CLIHelper.printLine("Unable to resolve given path\nScanning current director!",Color.CYAN);
-                configuration.setBasePath(".");
-            }
-            DependencyExcavator excavator = new DependencyExcavator();
-
-            DependencyScanResult result = excavator.excavate();
-
-            printResult(result);
-            
-            /**
-             *  TODO: Send data to services for processing & show the processed information
-             */
-
-            FileUtil.cleanup();
-        }else if(mode.getMode() == MODE.MONITOR){
-            return;
-        }else if(mode.getMode() == MODE.HELP){
-            CLIHelper.printHelp();
-            return;
+        switch(mode.getMode()) {
+            case SCAN:
+                scan(mode.getTargetPath(),mode.getDestinationPath());
+                break;
+            case MONITOR:
+                monitor(mode.getTargetPath());
+                break;
+            case HELP:
+                CLIHelper.printHelp();
+                break;
+            default:
+                CLIHelper.printHelp();
         }
     }
     
+    private static void scan(String targetPath, String destPath){
+        printOrganizationalData();
+        if(targetPath!=null)
+            Configuration.getConfiguration().setBasePath(targetPath);
+        // Else we scan the current dir only
+        else
+        {
+            CLIHelper.printLine("Unable to resolve given path\nScanning current director!",Color.CYAN);
+            Configuration.getConfiguration().setBasePath(".");
+        }
+        DependencyExcavator excavator = new DependencyExcavator();
+
+        DependencyScanResult result = excavator.excavate();
+
+        printResult(result);
+
+        /**
+         *  TODO: Send data to services for processing & show the processed information
+         */
+        
+        /**
+         * TODO: Save the report at destPath
+         */
+
+        FileUtil.cleanup();
+    }
+    
+    private static void monitor(String url) {
+        if(url==null || !NetworkHelper.isValidURL(url)){
+            CLIHelper.printLine("INVALID URL TO SCAN!", Color.RED);
+            return;
+        }
+        Path targetPath = FileUtil.getFilePathFromURL(url, Configuration.getConfiguration().getCloneLocation().toString());
+        scan(targetPath.toString(), null);
+    }
     
     private static void printResult(DependencyScanResult result) {
         for(DependencyManager manager: result.getResult()){

@@ -12,7 +12,8 @@ The tool scans the metadata file (e.g. pom.xml for maven based projects and pack
 
 - [X] License Detection through License files
 - [ ] License Detection through README files (If no License file is found in the package)
-- [ ] Supports scanning remote public repo
+- [X] Supports scanning remote public repo
+- [X] Support scanning a remote package (zip/tarball)
 - [ ] Export report as XML/JSON
 
 ### Supported package/project managers
@@ -39,5 +40,8 @@ mvn -DskipTests package
 
 ## Usage
 
+To scan a local project
 `java -jar <path-to-jar> scan -src <path-for-the-project-to-scan>`
 
+To scan a remote repository/package (zip/tarball)
+`java -jar <path-to-jar> monitor -src <path-for-the-project-to-scan>`
