@@ -1,6 +1,7 @@
 package com.gahloutsec.drona.Utils;
 
-import com.gahloutsec.drona.Models.DependencyScanResult;
+import com.phsyberdome.drona.Utils.JSONHelper;
+import com.phsyberdome.drona.Models.DependencyScanResult;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
@@ -35,7 +36,7 @@ public class JSONHelperTest {
     }
 
     /**
-     * Test of scanResultToJSONObject method, of class JSONHelper.
+     * Test of scanResultToJSONObjectString method, of class JSONHelper.
      */
     @Test
     public void testScanResultToJSONObject() throws Exception {

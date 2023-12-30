@@ -12,8 +12,8 @@
             <properties>
                 <exec.vmArgs></exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs>scan -src sfsf</exec.appArgs>
-                <exec.mainClass>com.gahloutsec.drona.Drona</exec.mainClass>
+                <exec.appArgs>scan</exec.appArgs>
+                <exec.mainClass>com.phsyberdome.drona.Drona</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir>C:\Users\pgahl\OneDrive\Desktop\NITC Waste Management\Backend</exec.workingdir>
                 
@@ -31,8 +31,8 @@
             <properties>
                 <exec.vmArgs>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs>scan -src sfsf</exec.appArgs>
-                <exec.mainClass>com.gahloutsec.drona.Drona</exec.mainClass>
+                <exec.appArgs>scan</exec.appArgs>
+                <exec.mainClass>com.phsyberdome.drona.Drona</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
                 <exec.workingdir>C:\Users\pgahl\OneDrive\Desktop\NITC Waste Management\Backend</exec.workingdir>
@@ -51,10 +51,10 @@
             <properties>
                 <exec.vmArgs></exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.mainClass>com.gahloutsec.drona.Drona</exec.mainClass>
+                <exec.mainClass>com.phsyberdome.drona.Drona</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir>C:\Users\pgahl\OneDrive\Desktop\NITC Waste Management\Backend</exec.workingdir>
-                <exec.appArgs>scan -src sfsf</exec.appArgs>
+                <exec.appArgs>scan</exec.appArgs>
             </properties>
         </action>
         <action>

@@ -1,7 +1,7 @@
 package com.gahloutsec.drona.Plugins;
 
-import com.gahloutsec.drona.Models.Dependencies;
-import com.gahloutsec.drona.Models.DependencyManager;
+import com.phsyberdome.drona.Models.Dependencies;
+import com.phsyberdome.drona.Models.DependencyManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,7 +1,7 @@
 
-import com.gahloutsec.drona.licensedetector.LicenseDatabase;
-import com.gahloutsec.drona.licensedetector.LicenseDetector;
-import com.gahloutsec.drona.licensedetector.Normalizer;
+import com.phsyberdome.drona.licensedetector.LicenseDatabase;
+import com.phsyberdome.drona.licensedetector.LicenseDetector;
+import com.phsyberdome.drona.licensedetector.Normalizer;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;

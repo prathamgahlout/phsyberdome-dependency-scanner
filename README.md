@@ -1,5 +1,5 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# Phsyberdome Dependency Scanner And License Detector 
+This is a command line tool written in Java to scan the dependencies of a project and detect their Licenses.
 
 # Getting Started
 TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
