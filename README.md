@@ -1,20 +1,41 @@
 # Phsyberdome Dependency Scanner And License Detector 
-This is a command line tool written in Java to scan the dependencies of a project and detect their Licenses.
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+A command line tool written in Java to scan the dependencies of a project and detect their Licenses. I wrote this while building an SCA Tool.
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+The tool scans the metadata file (e.g. pom.xml for maven based projects and package.json for npm) and creates a dependency tree by recursively resolving each dependency fromrespective repositories. The license (if found) is analyzed and matched with the licenses in the SPDX License Database using methods of NLP. The motivation for the algorithm of license detection is taken from [Link](https://github.com/go-enry/go-license-detector).
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+## TODO
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+### Features
+
+- [X] License Detection through License files
+- [ ] License Detection through README files (If no License file is found in the package)
+- [ ] Supports scanning remote public repo
+- [ ] Export report as XML/JSON
+
+### Supported package/project managers
+
+- [X] NPM
+- [X] JAVA Maven
+- [ ] JAVA Gradle
+- [ ] PyPI
+- [ ] Rubygems
+- [ ] Cargo
+- [ ] Go Packages
+
+### Misc
+
+- [ ] Write Tests
+
+
+## Build
+
+Build the jar package
+```
+mvn -DskipTests package
+```
+
+## Usage
+
+`java -jar <path-to-jar> scan -src <path-for-the-project-to-scan>`
+

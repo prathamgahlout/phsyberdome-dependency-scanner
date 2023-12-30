@@ -55,6 +55,7 @@ public class DependencyTree {
     }
 
     public void prettyPrintTree() {
+        CLIHelper.updateCurrentLine("", Ansi.Color.YELLOW);
         printNode(rootNode, "");
     }
     

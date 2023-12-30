@@ -75,7 +75,14 @@ public class NodePackageManagerPlugin implements PluginInterface{
         
         
         File pkgLockFile = FileUtil.searchFile(Configuration.getConfiguration().getBasePath().toFile(), "package-lock.json");
+        
+        /**
+         * Forcing to resolve dependencies using `package.json` file until support for lockFile version 2 & 3 are
+         * added.
+         */
         pkgLockFile = null;
+        
+        
         if(pkgLockFile!=null && pkgLockFile.exists()){
             // Read the package-lock.json
             ObjectMapper mapper = new ObjectMapper();
