@@ -15,5 +15,8 @@ public interface ConfigurationInterface {
     
     public String getUserId();
     public String getOrgId();
-    public String getAPIEndpoint();
+    public String getFeedEndpoint();
+    public String getUserDataEndpoint();
+    public String getOrgDataEndpoint();
+    public String getAuthToken();
 }

@@ -77,20 +77,22 @@ public class Drona {
     
     private static void printOrganizationalData() {
         if(
-            Configuration.getConfiguration().getAPIEndpoint() == null ||
+            Configuration.getConfiguration().getFeedEndpoint()== null ||
             Configuration.getConfiguration().getOrgId() == null ||
-            Configuration.getConfiguration().getUserId() == null
+            Configuration.getConfiguration().getUserId() == null ||
+            Configuration.getConfiguration().getUserDataEndpoint() == null ||
+            Configuration.getConfiguration().getOrgDataEndpoint() == null ||
+            Configuration.getConfiguration().getAuthToken() == null
           ) {
             return;
         }
-        String endpoint = Configuration.getConfiguration().getAPIEndpoint();
         
         ArrayList<Pair<String,String>> params = new ArrayList<Pair<String,String>>();
         params.add(new Pair<String,String>("orgId",Configuration.getConfiguration().getOrgId()));
         String orgJsonParam = JSONHelper.createJSONObjectString(
                 params
         );
-        String orgData = NetworkHelper.postData(endpoint + "/acc/org",orgJsonParam);
+        String orgData = NetworkHelper.postData(Configuration.getConfiguration().getOrgDataEndpoint(),orgJsonParam);
         
         params.clear();
         params.add(new Pair<String,String>("userId",Configuration.getConfiguration().getUserId()));
@@ -98,7 +100,7 @@ public class Drona {
                 params
         );
         
-        String userData = NetworkHelper.postData(endpoint + "/acc/user", userJsonParam);
+        String userData = NetworkHelper.postData(Configuration.getConfiguration().getUserDataEndpoint(), userJsonParam);
         String userName = JSONHelper.getValue("/name", userData);
         String orgName = JSONHelper.getValue("/name", orgData);
         

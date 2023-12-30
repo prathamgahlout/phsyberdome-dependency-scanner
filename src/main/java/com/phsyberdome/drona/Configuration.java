@@ -24,17 +24,24 @@ public class Configuration implements ConfigurationInterface{
     private static Configuration _instance = null;
     private final Path cloneLocation = FileSystems.getDefault().getPath(".").resolve(".drona/temp/remote_clones/");
     
+    /*
+    TODO: Create a separate model for Config File Data
+    */
     private String USER_ID;
     private String ORG_ID;
-    private String API_ENDPOINT;
+    private String USER_DATA_ENDPOINT;
+    private String ORG_DATA_ENDPOINT;
+    private String AUTH_TOKEN;
+    private String FEED_ENDPOINT;
     
     private Configuration(){
         if(!cloneLocation.toFile().exists()){
             cloneLocation.toFile().mkdirs();
         }
         
-        // Read all these configurations from the configuration.json file
+        // Read all these configurations from the configuration file
         licenseDataURL = "https://spdx.org/licenses/";
+        
         readConfigFile("phsyberdome-cli.config");
     }
     
@@ -58,16 +65,27 @@ public class Configuration implements ConfigurationInterface{
                     if(config.length != 2){
                         throw new IOException("INVALID CONFIGURATION FILE!");
                     }
-                    if("ORG_ID".equals(config[0])) {
-                        ORG_ID = config[1];
-                    }else if("USER_ID".equals(config[0])){
-                        USER_ID = config[1];
-                    }else if("DOME_ADDRESS".equals(config[0])){
-                        API_ENDPOINT = config[1];
-                        while(API_ENDPOINT.endsWith("/")){
-                            API_ENDPOINT = API_ENDPOINT.substring(0,API_ENDPOINT.length()-1);
-                        }
+                    switch(config[0]){
+                        case "ORG_ID":
+                            ORG_ID = config[1];
+                            break;
+                        case "USER_ID":
+                            USER_ID = config[1];
+                            break;
+                        case "SERVICE_ENDPOINT":
+                            FEED_ENDPOINT = stripOfSlashes(config[1]);
+                            break;
+                        case "USER_DATA_ENDPOINT":
+                            USER_DATA_ENDPOINT = stripOfSlashes(config[1]);
+                            break;
+                        case "ORG_DATA_ENDPOINT":
+                            ORG_DATA_ENDPOINT = stripOfSlashes(config[1]);
+                            break;
+                        case "AUTH_TOKEN":
+                            AUTH_TOKEN = config[1];
+                            break;
                     }
+                   
                 }
                 br.close();
                 fr.close();
@@ -117,9 +135,33 @@ public class Configuration implements ConfigurationInterface{
     }
 
     @Override
-    public String getAPIEndpoint() {
-        return API_ENDPOINT;
+    public String getFeedEndpoint() {
+        return FEED_ENDPOINT;
     }
+
+    @Override
+    public String getUserDataEndpoint() {
+        return USER_DATA_ENDPOINT;
+    }
+
+    @Override
+    public String getOrgDataEndpoint() {
+        return ORG_DATA_ENDPOINT;
+    }
+
+    @Override
+    public String getAuthToken() {
+        return AUTH_TOKEN;
+    }
+    
+
+    private String stripOfSlashes(String url) {
+        while(url.endsWith("/")){
+            url = url.substring(0,url.length()-1);
+        }
+        return url;
+    }
+    
     
     
 }
