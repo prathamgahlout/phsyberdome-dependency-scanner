@@ -98,6 +98,7 @@ public class Configuration implements ConfigurationInterface{
             }
         }else {
             CLIHelper.printLine("No config file found!",Color.CYAN);
+            CLIHelper.printDivider(Color.YELLOW);
         }
     }
     
