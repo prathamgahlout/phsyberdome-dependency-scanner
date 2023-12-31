@@ -5,6 +5,7 @@ package com.phsyberdome.drona.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.phsyberdome.drona.Models.Pair;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class JSONHelper {
         ObjectMapper objectMapper = new ObjectMapper();
         String json;
         try {
-            json = objectMapper.writeValueAsString(object);
+            json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
         }catch(JsonProcessingException e) {
             Logger.getLogger(JSONHelper.class.getCanonicalName()).log(Level.WARNING, e.getLocalizedMessage());
             return null;
