@@ -7,6 +7,7 @@ import com.phsyberdome.drona.licensedetector.LicenseDetector;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -15,6 +16,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -70,11 +72,16 @@ public class FileUtil {
     }
     
     public static boolean  verifyIfDirectoryExists(String path){
-        Path srcPath = Paths.get(path);
-        if(srcPath!=null && srcPath.toFile()!=null && srcPath.toFile().exists()){
-            return true;
+        try {
+            Path srcPath = Paths.get(path);
+            if(srcPath!=null && srcPath.toFile()!=null && srcPath.toFile().exists()){
+                return true;
+            }else{
+                return false;
+            }
+        }catch(InvalidPathException ex) {
+            return false;
         }
-        return false;
     }
     
     private static void sortListOfFilesToKeepDirectoriesAtEnd(File[] arr){

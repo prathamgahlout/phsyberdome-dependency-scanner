@@ -22,6 +22,16 @@ import org.apache.commons.io.IOUtils;
  */
 public class NetworkHelper {
     
+    public static boolean isValidURL(String urlString) {
+        try{
+            URL url = new URL(urlString);
+            url.toURI();
+            return true;
+        }catch(Exception e){
+            return false;
+        }
+    }
+    
     public static String postData(String destUrl, String payload) {
         
         String response = "{\"ERROR\":\"NO_RESPONSE\"}";

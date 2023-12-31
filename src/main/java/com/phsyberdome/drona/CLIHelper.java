@@ -7,10 +7,10 @@ import com.phsyberdome.drona.Models.MODE;
 import com.phsyberdome.drona.Models.Pair;
 import com.phsyberdome.drona.Models.RunMode;
 import com.phsyberdome.drona.Utils.FileUtil;
+import com.phsyberdome.drona.Utils.NetworkHelper;
 import java.util.ArrayList;
 import java.util.List;
 import org.fusesource.jansi.Ansi.*;
-import org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
 import org.fusesource.jansi.AnsiConsole;
 
@@ -105,7 +105,7 @@ public class CLIHelper {
         
         for(Pair<CLI_FLAGS,String> flag : flags){
             if(flag.first == CLI_FLAGS.src){
-                if(FileUtil.verifyIfDirectoryExists(flag.second))
+                if(FileUtil.verifyIfDirectoryExists(flag.second) || NetworkHelper.isValidURL(flag.second))
                     runMode.setTargetPath(flag.second);
             }else if(flag.first == CLI_FLAGS.dest){
                 if(FileUtil.verifyIfDirectoryExists(flag.second))
@@ -117,7 +117,7 @@ public class CLIHelper {
 
     public static void printHelp(){
         System.out.println("````````````````````````````````````````````````````");
-        System.out.println("DRONA-CLI");
+        System.out.println("PHSYBERDOME-CLI");
         System.out.println("````````````````````````````````````````````````````");
         System.out.println();
         System.out.println("COMMANDS:");
@@ -149,10 +149,12 @@ public class CLIHelper {
     }
     
     public static void printLine(String data, Color color) {
+        updateCurrentLine("", color);
         System.out.println(ansi().fg(color).a(data).reset());
     }
     
     public static void print(String data, Color color) {
+        updateCurrentLine("", color);
         System.out.print(ansi().fg(color).a(data).reset());
     }
     

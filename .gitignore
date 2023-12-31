@@ -13,3 +13,4 @@ buildNumber.properties
 jshell.history
 /nbproject/
 /target-old/
+nbactions.xml
