@@ -12,6 +12,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.Ansi.Color;
 
 /**
  *
@@ -95,7 +97,7 @@ public class Configuration implements ConfigurationInterface{
                 Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "UNABLE TO READ CONFIG FILE", ex);
             }
         }else {
-            Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, "No config file found!");
+            CLIHelper.printLine("No config file found!",Color.CYAN);
         }
     }
     

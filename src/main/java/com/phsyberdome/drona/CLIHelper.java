@@ -149,12 +149,10 @@ public class CLIHelper {
     }
     
     public static void printLine(String data, Color color) {
-        updateCurrentLine("", color);
         System.out.println(ansi().fg(color).a(data).reset());
     }
     
     public static void print(String data, Color color) {
-        updateCurrentLine("", color);
         System.out.print(ansi().fg(color).a(data).reset());
     }
     
