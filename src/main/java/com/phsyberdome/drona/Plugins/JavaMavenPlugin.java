@@ -62,7 +62,7 @@ public class JavaMavenPlugin implements PluginInterface
         File file = FileUtil.searchFile(Configuration.getConfiguration().getBasePath().toFile(), "(.*\\.(pom|POM))|(pom\\.(xml|XML))");
         if(file == null) {
             CLIHelper.updateCurrentLine("pom file not found in project",Ansi.Color.RED);
-            
+   
             return;
         }
         Path path = file.toPath();
@@ -73,6 +73,11 @@ public class JavaMavenPlugin implements PluginInterface
                 CLIHelper.updateCurrentLine("Couldn't read pom file",Ansi.Color.RED);
                 return;
             }
+            String rootArtifactId = PomReader.extractAttributeFromNode(doc.getDocumentElement(), "artifactId");
+            String rootGroupId = PomReader.extractAttributeFromNode(doc.getDocumentElement(), "groupId");
+            String rootVersion = PomReader.extractAttributeFromNode(doc.getDocumentElement(), "version");
+            Module root = new Module(rootArtifactId,rootVersion);
+            
             NodeList list = doc.getElementsByTagName("dependency");
             
             for(int i=0;i<list.getLength();i++){
@@ -105,9 +110,10 @@ public class JavaMavenPlugin implements PluginInterface
                     }else{
                         CLIHelper.updateCurrentLine("Cannot proceed! REASON: Couldnt get version for "+m.getName(),Ansi.Color.CYAN);
                     }
-                    modules.add(m);
+                    root.addToDependencies(m);
                 }
             }
+            modules.add(root);
         }else{
             CLIHelper.updateCurrentLine("pom file not found at " + path.toAbsolutePath().toString(),Ansi.Color.RED);
         }

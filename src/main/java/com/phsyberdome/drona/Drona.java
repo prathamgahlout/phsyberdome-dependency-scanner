@@ -83,7 +83,13 @@ public class Drona {
             CLIHelper.printLine("INVALID URL TO SCAN!", Color.RED);
             return;
         }
+        CLIHelper.updateCurrentLine("Downloading repository/package...", Color.YELLOW);
         Path targetPath = FileUtil.getFilePathFromURL(url, Configuration.getConfiguration().getCloneLocation().toString());
+        if(targetPath==null){
+            return;
+        }
+        CLIHelper.updateCurrentLine("", Color.BLUE);
+        CLIHelper.printLine("Downloaded repository/package", Color.BLUE);
         scan(targetPath.toString(), null);
     }
     

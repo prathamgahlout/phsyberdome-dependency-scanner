@@ -158,7 +158,7 @@ public class PomReader {
         repoUrlString += ("/" + artifactId + "-" + version + ".pom");
         return repoUrlString;
     }
-
+ 
     
     public static String extractAttributeFromNode(Element element, String attrib){
         NodeList n = element.getElementsByTagName(attrib);
