@@ -156,6 +156,23 @@ public class FileUtil {
         return null;
     }
     
+    public static File downloadFile(String path, String url){
+        File file = FileSystems.getDefault().getPath(path).toFile();
+        if(file.exists()) {
+            FileUtil.deleteDirectory(file);
+        }
+        try {
+            FileUtils.copyURLToFile(new URL(url), file);
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(MavenRepoHelper.class.getName()).log(Level.SEVERE, null, ex);
+            return  null;
+        } catch (IOException ex) {
+            Logger.getLogger(MavenRepoHelper.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+        return file;
+    }
+    
      public static boolean validateRepository(String repositoryURL) {
         boolean result = false;
         File file = new File("/tmp");

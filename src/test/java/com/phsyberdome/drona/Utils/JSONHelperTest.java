@@ -1,4 +1,4 @@
-package com.gahloutsec.drona.Utils;
+package com.phsyberdome.drona.Utils;
 
 import com.phsyberdome.drona.Utils.JSONHelper;
 import com.phsyberdome.drona.Models.DependencyScanResult;

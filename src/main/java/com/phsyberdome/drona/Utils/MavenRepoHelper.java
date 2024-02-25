@@ -2,20 +2,24 @@
 
 package com.phsyberdome.drona.Utils;
 
+import com.phsyberdome.drona.CLIHelper;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.FileUtils;
+import org.fusesource.jansi.Ansi;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -26,7 +30,8 @@ import org.xml.sax.SAXException;
  *
  * @author Pratham Gahlout
  */
-public class PomReader {
+public class MavenRepoHelper {
+    
     
     public static boolean isProperty(String prop) {
         if(prop == null){
@@ -36,7 +41,7 @@ public class PomReader {
         return propPattern.matcher(prop).matches();
     }
     
-    public static Document readPom(Path path) {
+    public static Document readXMLDocument(Path path) {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try{
             dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
@@ -54,9 +59,23 @@ public class PomReader {
         return null;
     }
     
+    
+    
+    public static Document getMavenMetadataDocument(String groupId, String artifactId) {
+        String repoUrl = buildRootRepoUrl(groupId, artifactId);
+        String mvnMetadataFileUrl = repoUrl + "maven-metadata.xml";
+        
+        File metadataFile = FileUtil.downloadFile("/.drona/temp/data/metadata.xml", mvnMetadataFileUrl);
+        Document doc = readXMLDocument(metadataFile.toPath());
+        if(metadataFile.exists()){
+            FileUtil.deleteDirectory(metadataFile);
+        }
+        return doc;
+    }
+    
     public static String resolvePropertyValue(String property, Document pom) {
         if(pom == null){
-            System.out.println("The property "+property+" could not be resolved!");
+            CLIHelper.updateCurrentLine("The property "+property+" could not be resolved!",Ansi.Color.RED);
             return null;
         }
         if(!isProperty(property)) {
@@ -83,7 +102,7 @@ public class PomReader {
                 }
             }
         }else {
-            System.out.println("No properties in this file");
+            CLIHelper.updateCurrentLine("No properties in this file",Ansi.Color.RED);
         }
         
         //If not found in properties, search the parent and fetch
@@ -98,9 +117,9 @@ public class PomReader {
                 if(node.getNodeType() == Node.ELEMENT_NODE) {
                     Element element = (Element) node;
 
-                    String Id = PomReader.extractAttributeFromNode(element, "artifactId");
-                    String groupId = PomReader.extractAttributeFromNode(element, "groupId");
-                    String version = PomReader.extractAttributeFromNode(element, "version");
+                    String Id = MavenRepoHelper.extractAttributeFromNode(element, "artifactId");
+                    String groupId = MavenRepoHelper.extractAttributeFromNode(element, "groupId");
+                    String version = MavenRepoHelper.extractAttributeFromNode(element, "version");
                     
                     if(Id.equals(artifactId)){
                         return resolvePropertyValue(version, doc);
@@ -125,27 +144,24 @@ public class PomReader {
         String version = parent.getElementsByTagName("version").item(0).getTextContent();
         //version = resolvePropertyValue(version, pom);
         String urlToParentPom = buildUrlForPomFile(groupId, artifactId, version);
-        File file = FileSystems.getDefault().getPath("/.drona/temp/poms/" + "pom.xml").toFile();
-        if(file.exists()) {
-            FileUtil.deleteDirectory(file);
-        }
-        try {
-            FileUtils.copyURLToFile(new URL(urlToParentPom), file);
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(PomReader.class.getName()).log(Level.SEVERE, null, ex);
-            return  null;
-        } catch (IOException ex) {
-            Logger.getLogger(PomReader.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
-        Document doc = readPom(file.toPath());
+        File file = FileUtil.downloadFile("/.drona/temp/poms/pom.xml", urlToParentPom);
+        Document doc = readXMLDocument(file.toPath());
         if(file.exists()){
             FileUtil.deleteDirectory(file);
         }
         return doc;
     }
     
+    
+    
     public static String buildUrlForPomFile(String groupId,String artifactId,String version) {
+        String repoUrlString = buildRootRepoUrl(groupId, artifactId);
+                
+        repoUrlString += version;
+        repoUrlString += ("/" + artifactId + "-" + version + ".pom");
+        return repoUrlString;
+    }
+    public static String buildRootRepoUrl(String groupId,String artifactId){
         String repoUrlString = "https://repo1.maven.org/maven2/";
         String[] domainSplit = groupId.split("\\.");
         for(String token : domainSplit) {
@@ -154,8 +170,6 @@ public class PomReader {
         }
         
         repoUrlString += artifactId + "/";
-        repoUrlString += version;
-        repoUrlString += ("/" + artifactId + "-" + version + ".pom");
         return repoUrlString;
     }
  
