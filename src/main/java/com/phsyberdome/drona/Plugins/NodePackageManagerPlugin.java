@@ -43,9 +43,9 @@ import org.fusesource.jansi.Ansi;
  */
 public class NodePackageManagerPlugin implements PluginInterface{
     
-    // TODO: MOVE ALL THIS TO A CONFIG FILE
-    final private String CMD_VERSION = "cmd /c npm -v";
-    final private String CMD_LIST = "cmd /c npm list -json";
+//    // TODO: MOVE ALL THIS TO A CONFIG FILE
+//    final private String CMD_VERSION = "cmd /c npm -v";
+//    final private String CMD_LIST = "cmd /c npm list -json";
     
     private DependencyManager pm;
     
@@ -69,8 +69,8 @@ public class NodePackageManagerPlugin implements PluginInterface{
     
     public void readModulesV2() {
         modules = new ArrayList<>();
-        String pm_version = SysRunner.run(CMD_VERSION);
-        pm = new DependencyManager("npm",pm_version);
+//        String pm_version = SysRunner.run(CMD_VERSION);
+        pm = new DependencyManager("npm","unknown");
         
         
         

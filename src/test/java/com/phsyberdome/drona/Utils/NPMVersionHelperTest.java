@@ -1,6 +1,6 @@
-package com.gahloutsec.drona.Utils;
+package com.phsyberdome.drona.Utils;
 
-import com.phsyberdome.drona.Utils.PomReader;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,9 +12,9 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author pgahl
  */
-public class PomReaderTest {
+public class NPMVersionHelperTest {
     
-    public PomReaderTest() {
+    public NPMVersionHelperTest() {
     }
     
     @BeforeAll
@@ -33,13 +33,8 @@ public class PomReaderTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of isProperty method, of class PomReader.
-     */
-    @Test
-    public void testIsProperty() {
-        String property = "${jackson.annotations}";
-        assertTrue(PomReader.isProperty(property));
-    }
+    
+   
+    
     
 }

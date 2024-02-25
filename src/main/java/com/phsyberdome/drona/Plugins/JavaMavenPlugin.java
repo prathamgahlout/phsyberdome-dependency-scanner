@@ -10,7 +10,7 @@ import com.phsyberdome.drona.licensedetector.LicenseDetector;
 import com.phsyberdome.drona.Models.Module;
 import com.phsyberdome.drona.Models.Pair;
 import com.phsyberdome.drona.Utils.FileUtil;
-import com.phsyberdome.drona.Utils.PomReader;
+import com.phsyberdome.drona.Utils.MavenRepoHelper;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -56,7 +56,7 @@ public class JavaMavenPlugin implements PluginInterface
     @Override
     public void readModules() {
         modules = new ArrayList<>();
-        pm = new DependencyManager("java-maven","null");
+        pm = new DependencyManager("java-maven","unknown");
         
         //Read the pom.xml
         File file = FileUtil.searchFile(Configuration.getConfiguration().getBasePath().toFile(), "(.*\\.(pom|POM))|(pom\\.(xml|XML))");
@@ -68,14 +68,14 @@ public class JavaMavenPlugin implements PluginInterface
         Path path = file.toPath();
         if(path!=null && path.toFile().exists()){
             // Read the xml
-            Document doc = PomReader.readPom(path);
+            Document doc = MavenRepoHelper.readXMLDocument(path);
             if(doc == null) {
                 CLIHelper.updateCurrentLine("Couldn't read pom file",Ansi.Color.RED);
                 return;
             }
-            String rootArtifactId = PomReader.extractAttributeFromNode(doc.getDocumentElement(), "artifactId");
-            String rootGroupId = PomReader.extractAttributeFromNode(doc.getDocumentElement(), "groupId");
-            String rootVersion = PomReader.extractAttributeFromNode(doc.getDocumentElement(), "version");
+            String rootArtifactId = MavenRepoHelper.extractAttributeFromNode(doc.getDocumentElement(), "artifactId");
+            String rootGroupId = MavenRepoHelper.extractAttributeFromNode(doc.getDocumentElement(), "groupId");
+            String rootVersion = MavenRepoHelper.extractAttributeFromNode(doc.getDocumentElement(), "version");
             Module root = new Module(rootArtifactId,rootVersion);
             
             NodeList list = doc.getElementsByTagName("dependency");
@@ -89,19 +89,19 @@ public class JavaMavenPlugin implements PluginInterface
                     Element element = (Element) node;
                     
                     
-                    String artifactId = PomReader.extractAttributeFromNode(element, "artifactId");
-                    String groupId = PomReader.extractAttributeFromNode(element, "groupId");
-                    String version = PomReader.extractAttributeFromNode(element, "version");
-                    String scope = PomReader.extractAttributeFromNode(element, "scope");
+                    String artifactId = MavenRepoHelper.extractAttributeFromNode(element, "artifactId");
+                    String groupId = MavenRepoHelper.extractAttributeFromNode(element, "groupId");
+                    String version = MavenRepoHelper.extractAttributeFromNode(element, "version");
+                    String scope = MavenRepoHelper.extractAttributeFromNode(element, "scope");
                     if(scope!=null && (scope.equals("test") || scope.equals("import"))){
                         continue;
                     }
                     // if we have a property as version.
                     if(version!=null)
-                        version = PomReader.resolvePropertyValue(version, doc);
+                        version = MavenRepoHelper.resolvePropertyValue(version, doc);
                     // If we dont even have version mentioned.
                     else
-                        version = PomReader.getVersionFromParent(artifactId,PomReader.getParentPOM(doc));
+                        version = MavenRepoHelper.getVersionFromParent(artifactId,MavenRepoHelper.getParentPOM(doc));
                     
                     Module m = new Module(artifactId,version);
                     m.setSupplier(groupId);
@@ -145,7 +145,7 @@ public class JavaMavenPlugin implements PluginInterface
             // May be jar doesnt come with a pom
             // Should I check for it at the repository?
             
-            String urlToPomString = PomReader.buildUrlForPomFile(root.getSupplier(), root.getName(), root.getVersion());
+            String urlToPomString = MavenRepoHelper.buildUrlForPomFile(root.getSupplier(), root.getName(), root.getVersion());
             file = FileSystems.getDefault().getPath("/.drona/temp/poms/" + "pom.xml").toFile();
             if(file.exists()) {
                 FileUtil.deleteDirectory(file);
@@ -153,10 +153,10 @@ public class JavaMavenPlugin implements PluginInterface
             try {
                 FileUtils.copyURLToFile(new URL(urlToPomString), file);
             } catch (MalformedURLException ex) {
-                Logger.getLogger(PomReader.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MavenRepoHelper.class.getName()).log(Level.SEVERE, null, ex);
                 return;
             } catch (IOException ex) {
-                Logger.getLogger(PomReader.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MavenRepoHelper.class.getName()).log(Level.SEVERE, null, ex);
                 return;
             }
             CLIHelper.updateCurrentLine("Downloaded pom from "+urlToPomString,Ansi.Color.GREEN);
@@ -165,7 +165,7 @@ public class JavaMavenPlugin implements PluginInterface
         
         if(path!=null && path.toFile().exists()){
             // Read the xml
-            Document doc = PomReader.readPom(path);
+            Document doc = MavenRepoHelper.readXMLDocument(path);
             if(doc == null) {
                 CLIHelper.updateCurrentLine("Couldn't read pom file",Ansi.Color.RED);
                 return;
@@ -179,19 +179,19 @@ public class JavaMavenPlugin implements PluginInterface
                         continue;
                     }
                     Element element = (Element) node;
-                    String artifactId = PomReader.extractAttributeFromNode(element, "artifactId");
-                    String groupId = PomReader.extractAttributeFromNode(element, "groupId");
-                    String version = PomReader.extractAttributeFromNode(element, "version");
-                    String scope = PomReader.extractAttributeFromNode(element, "scope");
+                    String artifactId = MavenRepoHelper.extractAttributeFromNode(element, "artifactId");
+                    String groupId = MavenRepoHelper.extractAttributeFromNode(element, "groupId");
+                    String version = MavenRepoHelper.extractAttributeFromNode(element, "version");
+                    String scope = MavenRepoHelper.extractAttributeFromNode(element, "scope");
                     if(scope!=null && (scope.equals("test") || scope.equals("import"))){
                         continue;
                     }
                     // if we have a property as version.
                     if(version!=null)
-                        version = PomReader.resolvePropertyValue(version, doc);
+                        version = MavenRepoHelper.resolvePropertyValue(version, doc);
                     // If we dont even have version mentioned.
                     else
-                        version = PomReader.getVersionFromParent(artifactId,PomReader.getParentPOM(doc));
+                        version = MavenRepoHelper.getVersionFromParent(artifactId,MavenRepoHelper.getParentPOM(doc));
                     
                     Module m = new Module(artifactId,version);
                     m.setSupplier(groupId);
