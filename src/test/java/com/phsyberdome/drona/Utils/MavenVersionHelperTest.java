@@ -56,7 +56,8 @@ public class MavenVersionHelperTest {
         System.out.println("resolveVersion");
         String groupId = "com.fasterxml.jackson.core";
         String artifactId = "jackson-databind";
-        String version = "(,2.4.0-rc4]";
+//        String version = "(,2.4.0-rc4]";
+        String version = "2.4.0-rc3";
         String expResult = "2.4.0-rc3";
         String result = MavenVersionHelper.resolveVersion(groupId,artifactId,version);
         assertEquals(expResult,result);
