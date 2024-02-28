@@ -11,6 +11,7 @@ import com.phsyberdome.drona.Models.Module;
 import com.phsyberdome.drona.Models.Pair;
 import com.phsyberdome.drona.Utils.FileUtil;
 import com.phsyberdome.drona.Utils.MavenRepoHelper;
+import com.phsyberdome.drona.Utils.MavenVersionHelper;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -102,7 +103,7 @@ public class JavaMavenPlugin implements PluginInterface
                     // If we dont even have version mentioned.
                     else
                         version = MavenRepoHelper.getVersionFromParent(artifactId,MavenRepoHelper.getParentPOM(doc));
-                    
+                    version = MavenVersionHelper.resolveVersion(groupId, artifactId, version);
                     Module m = new Module(artifactId,version);
                     m.setSupplier(groupId);
                     if(version!=null){
@@ -192,7 +193,7 @@ public class JavaMavenPlugin implements PluginInterface
                     // If we dont even have version mentioned.
                     else
                         version = MavenRepoHelper.getVersionFromParent(artifactId,MavenRepoHelper.getParentPOM(doc));
-                    
+                    version = MavenVersionHelper.resolveVersion(groupId, artifactId, version);
                     Module m = new Module(artifactId,version);
                     m.setSupplier(groupId);
                     if(version!=null){

@@ -4,6 +4,7 @@ package com.phsyberdome.drona.Utils;
 
 import com.phsyberdome.drona.CLIHelper;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -61,11 +62,14 @@ public class MavenRepoHelper {
     
     
     
-    public static Document getMavenMetadataDocument(String groupId, String artifactId) {
+    public static Document getMavenMetadataDocument(String groupId, String artifactId){
         String repoUrl = buildRootRepoUrl(groupId, artifactId);
         String mvnMetadataFileUrl = repoUrl + "maven-metadata.xml";
         
         File metadataFile = FileUtil.downloadFile("/.drona/temp/data/metadata.xml", mvnMetadataFileUrl);
+        if(metadataFile==null) {
+            return null;
+        }
         Document doc = readXMLDocument(metadataFile.toPath());
         if(metadataFile.exists()){
             FileUtil.deleteDirectory(metadataFile);
