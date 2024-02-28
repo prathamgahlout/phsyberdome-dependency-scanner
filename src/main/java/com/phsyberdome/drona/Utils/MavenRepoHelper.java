@@ -66,7 +66,12 @@ public class MavenRepoHelper {
         String repoUrl = buildRootRepoUrl(groupId, artifactId);
         String mvnMetadataFileUrl = repoUrl + "maven-metadata.xml";
         
-        File metadataFile = FileUtil.downloadFile("/.drona/temp/data/metadata.xml", mvnMetadataFileUrl);
+        File metadataFile;
+        try {
+            metadataFile = FileUtil.downloadFile("/.drona/temp/data/metadata.xml", mvnMetadataFileUrl);
+        } catch (IOException ex) {
+            return null;
+        }
         if(metadataFile==null) {
             return null;
         }
@@ -148,7 +153,12 @@ public class MavenRepoHelper {
         String version = parent.getElementsByTagName("version").item(0).getTextContent();
         //version = resolvePropertyValue(version, pom);
         String urlToParentPom = buildUrlForPomFile(groupId, artifactId, version);
-        File file = FileUtil.downloadFile("/.drona/temp/poms/pom.xml", urlToParentPom);
+        File file;
+        try {
+            file = FileUtil.downloadFile("/.drona/temp/poms/pom.xml", urlToParentPom);
+        } catch (IOException ex) {
+            return null;
+        }
         Document doc = readXMLDocument(file.toPath());
         if(file.exists()){
             FileUtil.deleteDirectory(file);

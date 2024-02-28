@@ -156,7 +156,7 @@ public class FileUtil {
         return null;
     }
     
-    public static File downloadFile(String path, String url){
+    public static File downloadFile(String path, String url)throws IOException{
         File file = FileSystems.getDefault().getPath(path).toFile();
         if(file.exists()) {
             FileUtil.deleteDirectory(file);
@@ -164,11 +164,8 @@ public class FileUtil {
         try {
             FileUtils.copyURLToFile(new URL(url), file);
         } catch (MalformedURLException ex) {
-            Logger.getLogger(MavenRepoHelper.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(MavenRepoHelper.class.getName()).log(Level.SEVERE, null, ex);
             return  null;
-        } catch (IOException ex) {
-            Logger.getLogger(MavenRepoHelper.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
         }
         return file;
     }
