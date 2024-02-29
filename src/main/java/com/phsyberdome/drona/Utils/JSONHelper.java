@@ -5,15 +5,14 @@ package com.phsyberdome.drona.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.phsyberdome.drona.CLIHelper;
 import com.phsyberdome.drona.Models.Pair;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.fusesource.jansi.Ansi;
 
 /**
  *
@@ -27,7 +26,7 @@ public class JSONHelper {
         try {
             json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
         }catch(JsonProcessingException e) {
-            Logger.getLogger(JSONHelper.class.getCanonicalName()).log(Level.WARNING, e.getLocalizedMessage());
+            CLIHelper.updateCurrentLine("Failed to convert to json!", Ansi.Color.RED);
             return null;
         }
         return json;
@@ -38,7 +37,7 @@ public class JSONHelper {
             ObjectMapper objectMapper = new ObjectMapper();
             return (T) objectMapper.readValue(json, c);
         }catch(Exception e) {
-            Logger.getLogger(JSONHelper.class.getCanonicalName()).log(Level.WARNING, e.getLocalizedMessage());
+            CLIHelper.updateCurrentLine("Failed to parse json!", Ansi.Color.RED);
         }
         return null;
     }
@@ -49,8 +48,8 @@ public class JSONHelper {
         try {
             root = objectMapper.readTree(json);
             return root.at(keyPath).asText();
-        } catch (JsonProcessingException ex) {
-            Logger.getLogger(JSONHelper.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e){
+            CLIHelper.updateCurrentLine("Failed to parse json!", Ansi.Color.RED);
         }
         return null;
     }
@@ -68,8 +67,8 @@ public class JSONHelper {
                 res.add(field.getKey());
             }
             return res;
-        } catch (JsonProcessingException ex) {
-            Logger.getLogger(JSONHelper.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            CLIHelper.updateCurrentLine("Failed to parse json!", Ansi.Color.RED);
         }
         return null;
     }
