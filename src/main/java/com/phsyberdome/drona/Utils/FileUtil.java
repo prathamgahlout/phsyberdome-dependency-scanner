@@ -215,10 +215,10 @@ public class FileUtil {
                 text = content.collect(Collectors.joining("\n"));
             }
             return text;
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             CLIHelper.updateCurrentLine(ex.getLocalizedMessage(), Ansi.Color.RED);
-            return null;
         }
+        return "";
     }
     
     public static void extractZipFolder(String zipFile,String extractFolder) 
@@ -331,7 +331,7 @@ public class FileUtil {
                 tarEntry = tarIn.getNextTarEntry();
             }
             tarIn.close();
-        }catch(IOException e){
+        }catch(Exception e){
            CLIHelper.updateCurrentLine("Failed to untar file " + tarfile,Ansi.Color.RED);
         }
 

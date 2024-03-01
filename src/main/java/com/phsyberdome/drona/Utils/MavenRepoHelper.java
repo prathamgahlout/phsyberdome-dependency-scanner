@@ -144,7 +144,6 @@ public class MavenRepoHelper {
     public static Document getParentPOM(Document pom) {
         NodeList parents = pom.getElementsByTagName("parent");
         if(parents.getLength() <= 0){
-            System.out.println("This is the root pom!");
             return null;
         }
         Element parent = (Element) parents.item(0);
@@ -155,7 +154,7 @@ public class MavenRepoHelper {
         String urlToParentPom = buildUrlForPomFile(groupId, artifactId, version);
         File file;
         try {
-            file = FileUtil.downloadFile("/.drona/temp/poms/pom.xml", urlToParentPom);
+            file = FileUtil.downloadFile("/.drona/temp/poms/"+artifactId+"_parent_pom.xml", urlToParentPom);
         } catch (IOException ex) {
             return null;
         }

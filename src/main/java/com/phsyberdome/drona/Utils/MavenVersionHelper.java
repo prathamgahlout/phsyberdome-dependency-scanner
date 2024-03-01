@@ -44,8 +44,13 @@ public class MavenVersionHelper {
     }
     
     public static String resolveVersion(String groupId,String artifactId,String version) {
+        if(version.length() == 0 || isPureVersion(version)) {
+            return version;
+        }
         ArrayList<String> allVersions = (ArrayList<String>) getAllVersions(groupId, artifactId);
-        
+        if(allVersions.isEmpty()) {
+            return version;
+        }
         List<MavenVersionRange> ranges = extractRanges(version);
         MavenVersion versionSpec = new MavenVersion(ranges);
         List<String> satisfiedVersions = new ArrayList<>();
@@ -100,5 +105,13 @@ public class MavenVersionHelper {
         }
         
         return ranges;
+    }
+    
+    private static boolean isPureVersion(String version) {
+        return !version.contains("(") 
+                || !version.contains(")")
+                || !version.contains("]")
+                || !version.contains("[")
+                || !version.contains(".");
     }
 }
