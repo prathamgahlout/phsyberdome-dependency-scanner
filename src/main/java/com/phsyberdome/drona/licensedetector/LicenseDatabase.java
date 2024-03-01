@@ -114,8 +114,10 @@ public class LicenseDatabase {
             pathToLicenseListJSON = pathToLicenseList.toString();
         } catch (MalformedURLException ex) {
             Logger.getLogger(LicenseDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(0);
         } catch (IOException ex) {
             Logger.getLogger(LicenseDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(0);
         }
         
         CLIHelper.printLine("License data downloaded at "+pathToLicenseListJSON.toString(), Color.GREEN);

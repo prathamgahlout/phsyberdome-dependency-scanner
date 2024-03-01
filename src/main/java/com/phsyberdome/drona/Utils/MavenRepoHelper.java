@@ -4,6 +4,7 @@ package com.phsyberdome.drona.Utils;
 
 import com.phsyberdome.drona.CLIHelper;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -61,11 +62,19 @@ public class MavenRepoHelper {
     
     
     
-    public static Document getMavenMetadataDocument(String groupId, String artifactId) {
+    public static Document getMavenMetadataDocument(String groupId, String artifactId){
         String repoUrl = buildRootRepoUrl(groupId, artifactId);
         String mvnMetadataFileUrl = repoUrl + "maven-metadata.xml";
         
-        File metadataFile = FileUtil.downloadFile("/.drona/temp/data/metadata.xml", mvnMetadataFileUrl);
+        File metadataFile;
+        try {
+            metadataFile = FileUtil.downloadFile("/.drona/temp/data/metadata.xml", mvnMetadataFileUrl);
+        } catch (IOException ex) {
+            return null;
+        }
+        if(metadataFile==null) {
+            return null;
+        }
         Document doc = readXMLDocument(metadataFile.toPath());
         if(metadataFile.exists()){
             FileUtil.deleteDirectory(metadataFile);
@@ -135,7 +144,6 @@ public class MavenRepoHelper {
     public static Document getParentPOM(Document pom) {
         NodeList parents = pom.getElementsByTagName("parent");
         if(parents.getLength() <= 0){
-            System.out.println("This is the root pom!");
             return null;
         }
         Element parent = (Element) parents.item(0);
@@ -144,7 +152,12 @@ public class MavenRepoHelper {
         String version = parent.getElementsByTagName("version").item(0).getTextContent();
         //version = resolvePropertyValue(version, pom);
         String urlToParentPom = buildUrlForPomFile(groupId, artifactId, version);
-        File file = FileUtil.downloadFile("/.drona/temp/poms/pom.xml", urlToParentPom);
+        File file;
+        try {
+            file = FileUtil.downloadFile("/.drona/temp/poms/"+artifactId+"_parent_pom.xml", urlToParentPom);
+        } catch (IOException ex) {
+            return null;
+        }
         Document doc = readXMLDocument(file.toPath());
         if(file.exists()){
             FileUtil.deleteDirectory(file);

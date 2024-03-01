@@ -156,7 +156,7 @@ public class FileUtil {
         return null;
     }
     
-    public static File downloadFile(String path, String url){
+    public static File downloadFile(String path, String url)throws IOException{
         File file = FileSystems.getDefault().getPath(path).toFile();
         if(file.exists()) {
             FileUtil.deleteDirectory(file);
@@ -164,11 +164,8 @@ public class FileUtil {
         try {
             FileUtils.copyURLToFile(new URL(url), file);
         } catch (MalformedURLException ex) {
-            Logger.getLogger(MavenRepoHelper.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(MavenRepoHelper.class.getName()).log(Level.SEVERE, null, ex);
             return  null;
-        } catch (IOException ex) {
-            Logger.getLogger(MavenRepoHelper.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
         }
         return file;
     }
@@ -218,10 +215,10 @@ public class FileUtil {
                 text = content.collect(Collectors.joining("\n"));
             }
             return text;
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             CLIHelper.updateCurrentLine(ex.getLocalizedMessage(), Ansi.Color.RED);
-            return null;
         }
+        return "";
     }
     
     public static void extractZipFolder(String zipFile,String extractFolder) 
@@ -334,7 +331,7 @@ public class FileUtil {
                 tarEntry = tarIn.getNextTarEntry();
             }
             tarIn.close();
-        }catch(IOException e){
+        }catch(Exception e){
            CLIHelper.updateCurrentLine("Failed to untar file " + tarfile,Ansi.Color.RED);
         }
 
