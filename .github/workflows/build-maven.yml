@@ -35,6 +35,13 @@ jobs:
         sudo mv apache-maven-3.9.6 /usr/local/apache-maven
         rm apache-maven-3.9.6-bin.tar.gz
         sudo update-alternatives --install /usr/bin/mvn mvn /usr/local/apache-maven/bin/mvn 1
+
+    - name: Check tool versions
+      run: |
+        java -version
+        javac -version
+        mvn -version
+        
     - name: Build all packages with Maven
       run: |
         cd common-utils
