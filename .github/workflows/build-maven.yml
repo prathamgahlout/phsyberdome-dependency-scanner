@@ -22,11 +22,19 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 21
-      uses: actions/setup-java@v3
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y openjdk-21-jdk
+          sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-21-openjdk-amd64/bin/java 1
+          sudo update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/java-21-openjdk-amd64/bin/javac 1
+
+    - name: Install Maven 3.9.6
+      run: |
+        wget https://downloads.apache.org/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
+        tar -xvf apache-maven-3.9.6-bin.tar.gz
+        sudo mv apache-maven-3.9.6 /usr/local/apache-maven
+        rm apache-maven-3.9.6-bin.tar.gz
+        sudo update-alternatives --install /usr/bin/mvn mvn /usr/local/apache-maven/bin/mvn 1
     - name: Build all packages with Maven
       run: |
         cd common-utils
