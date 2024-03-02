@@ -43,17 +43,17 @@ jobs:
     - name: Build all packages with Maven
       run: |
         cd common-utils
-        mvn -B package --file pom.xml
+        mvn clean install
         cd ..
         cd LicenseDetector
-        mvn -B package --file pom.xml
+        mvn clean install
         cd ..
         cd plugin.npm
-        mvn -B package --file pom.xml
+        mvn clean install
         cd ..
         cd plugin.maven
-        mvn -B package --file pom.xml
+        mvn clean install
         cd ..
         cd phsyberdome-dependency-scanner
-        mvn -B package --file pom.xml
+        mvn clean install
 
