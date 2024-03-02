@@ -27,6 +27,20 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+    - name: Build all packages with Maven
+      run: |
+        cd common-utils
+        mvn -B package --file pom.xml
+        cd ..
+        cd LicenseDetector
+        mvn -B package --file pom.xml
+        cd ..
+        cd plugin.npm
+        mvn -B package --file pom.xml
+        cd ..
+        cd plugin.maven
+        mvn -B package --file pom.xml
+        cd ..
+        cd phsyberdome-dependency-scanner
+        mvn -B package --file pom.xml
 
