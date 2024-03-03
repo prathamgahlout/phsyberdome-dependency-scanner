@@ -42,18 +42,6 @@ jobs:
 
     - name: Build all packages with Maven
       run: |
-        cd common-utils
-        mvn clean install
-        cd ..
-        cd LicenseDetector
-        mvn clean install
-        cd ..
-        cd plugin.npm
-        mvn clean install
-        cd ..
-        cd plugin.maven
-        mvn clean install
-        cd ..
-        cd phsyberdome-dependency-scanner
+        cd dependency-scanner
         mvn clean install
 
