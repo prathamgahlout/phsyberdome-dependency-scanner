@@ -28,7 +28,6 @@ public class PluginRegistry {
     
     private void init() {
          this.plugins = ServiceLoader.load(PluginInterface.class);
-         System.out.println(this.plugins.stream().count());
          plugins.forEach(plugin -> {
              plugin.setCloneLocation(Configuration.getConfiguration().getCloneLocation());
              plugin.setRootPath(Configuration.getConfiguration().getBasePath());
