@@ -37,9 +37,10 @@ The tool scans the metadata file (e.g. pom.xml for maven based projects and pack
 
 ## Build
 
-Build the jar package with Maven
+Go to the module aggregator `dependency-scanner` and build
 ```
-mvn -DskipTests package
+cd dependency-scanner
+mvn clean install
 ```
 
 ## Usage
