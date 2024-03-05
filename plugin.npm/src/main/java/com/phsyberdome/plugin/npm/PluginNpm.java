@@ -10,7 +10,6 @@ import com.phsyberdome.common.utils.models.Module;
 import com.phsyberdome.common.utils.models.Pair;
 import com.phsyberdome.common.utils.FileUtil;
 import com.phsyberdome.common.utils.JSONHelper;
-import com.phsyberdome.common.utils.NPMVersionHelperV2;
 import com.phsyberdome.common.interfaces.LicenseDetectorInterface;
 import java.io.BufferedReader;
 import java.io.File;

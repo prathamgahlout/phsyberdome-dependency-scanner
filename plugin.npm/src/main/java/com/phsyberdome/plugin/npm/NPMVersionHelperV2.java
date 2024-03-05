@@ -1,8 +1,8 @@
 
 
-package com.phsyberdome.common.utils;
+package com.phsyberdome.plugin.npm;
 
-import static com.phsyberdome.common.utils.NPMVersionHelper.fetchAllVersions;
+import static com.phsyberdome.plugin.npm.NPMVersionHelper.fetchAllVersions;
 import com.vdurmont.semver4j.Semver;
 import java.util.ArrayList;
 import java.util.Collections;

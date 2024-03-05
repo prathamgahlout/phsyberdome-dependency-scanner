@@ -1,7 +1,8 @@
 
 
-package com.phsyberdome.common.utils;
+package com.phsyberdome.plugin.npm;
 
+import com.phsyberdome.common.utils.JSONHelper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

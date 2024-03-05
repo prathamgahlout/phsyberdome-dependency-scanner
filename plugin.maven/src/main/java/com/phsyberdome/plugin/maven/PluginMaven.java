@@ -9,8 +9,6 @@ import com.phsyberdome.common.utils.models.DependencyManager;
 import com.phsyberdome.common.utils.models.Pair;
 import com.phsyberdome.common.utils.models.Module;
 import com.phsyberdome.common.utils.FileUtil;
-import com.phsyberdome.common.utils.MavenRepoHelper;
-import com.phsyberdome.common.utils.MavenVersionHelper;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
