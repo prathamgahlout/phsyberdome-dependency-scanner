@@ -58,5 +58,5 @@ java -jar <path-to-jar> monitor -src <url>
 ## CONTRIBUTING
 
 Contributions are always welcome. Help me make this software bug free, robust and support more package managers.
-Please feel free to raise an issue and discuss.
+Please feel free to raise an issue and discuss. Read the [CONTRIBUTION GUIDELINES](https://github.com/prathamgahlout/phsyberdome-dependency-scanner/blob/master/CONTRIBUTING.md).
 
