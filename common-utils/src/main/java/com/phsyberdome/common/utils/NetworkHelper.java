@@ -5,7 +5,6 @@ package com.phsyberdome.common.utils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
-import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -75,6 +74,17 @@ public class NetworkHelper {
     
     public static String getData(String endpoint) {
         String response = "NO_RESPONSE";
+        try {
+            URL url = new URL(endpoint);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            StringWriter writer = new StringWriter();
+            IOUtils.copy(connection.getInputStream(),writer,Charset.forName("UTF-8"));
+            response = writer.toString();
+            
+        }catch(Exception e) {
+            
+        }
         return response;
     }
 

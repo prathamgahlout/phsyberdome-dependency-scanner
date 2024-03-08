@@ -34,7 +34,7 @@ public class NPMVersionHelperV2 {
         }
         
         sortCandidates(candidates);
-        return candidates.size()>0 ? candidates.get(candidates.size()-1).getValue() : version;
+        return !candidates.isEmpty() ? candidates.get(candidates.size()-1).getValue() : version;
     }
 
     private static void sortCandidates(List<Semver> candidates){

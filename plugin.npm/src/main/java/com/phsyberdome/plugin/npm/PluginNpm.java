@@ -310,34 +310,6 @@ public class PluginNpm implements PluginInterface{
      public ArrayList<Module> getModules() {
         return this.modules;
     }
-    
-    
-    
-    private Module extractModule(String d) {
-        // last @
-        return new Module(extractName(d),extractVersion(d));
-    }
-    
-    private String extractName(String d) {
-        d = d.trim();
-        if(d.length() == 0)
-            return null;
-        String[] s = d.split("@");
-        String name = s[s.length - 2];
-        if(name.split(" ").length > 1){
-            String[] a = name.split(" ");
-            return a[a.length - 1];
-        }
-        return name;
-    }
-    private String extractVersion(String d) {
-        String[] s = d.split("@");
-        return s[s.length - 1];
-    }
-    
-    private String getLicenseOfModule(Path path) {
-        return licenseDetector.detect(path.toString()).first;
-    }
 
     @Override
     public DependencyManager getPackageManager() {

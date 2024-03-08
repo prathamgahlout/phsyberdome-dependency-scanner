@@ -53,8 +53,8 @@ public class JSONHelper {
         return null;
     }
     
-    public static List<String> getValues(String keyPath,String json){
-        List<String> res = new ArrayList<>();
+    public static List<Pair<String,String>> getValues(String keyPath,String json){
+        List<Pair<String,String>> res = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode root = objectMapper.createObjectNode();
         try {
@@ -63,9 +63,27 @@ public class JSONHelper {
             Iterator it = myNode.fields();
             while(it.hasNext()){
                 Map.Entry<String,JsonNode> field = (Map.Entry<String,JsonNode>) it.next();
-                res.add(field.getKey());
+                res.add(new Pair<>(field.getKey(),field.getValue().toPrettyString()));
             }
             return res;
+        } catch (Exception ex) {
+            CLIHelper.updateCurrentLine("Failed to parse json!", Ansi.Color.RED);
+        }
+        return null;
+    }
+    
+    public static List<String> getArray(String keyPath, String json) {
+        List<String> res = new ArrayList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode root = objectMapper.createObjectNode();
+        try {
+            root = objectMapper.readTree(json);
+            JsonNode myNode = root.at(keyPath);
+            if(myNode.isArray()) {
+                myNode.forEach(obj -> res.add(obj.toString()));
+                return res;
+            }
+            throw new Exception();
         } catch (Exception ex) {
             CLIHelper.updateCurrentLine("Failed to parse json!", Ansi.Color.RED);
         }

@@ -3,6 +3,7 @@
 package com.phsyberdome.plugin.npm;
 
 import com.phsyberdome.common.utils.JSONHelper;
+import com.phsyberdome.common.utils.models.Pair;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -352,7 +353,8 @@ public class NPMVersionHelper {
             for (String line; (line = bufferedReader.readLine()) != null; ) {
                 temp.append(line);
             }
-            return JSONHelper.getValues("/versions", temp.toString());
+            List<Pair<String,String>> versionObjs =  JSONHelper.getValues("/versions", temp.toString());
+            return (List<String>) versionObjs.stream().map(pair -> pair.second);
             
         } catch (MalformedURLException ex) {
             Logger.getLogger(NPMVersionHelper.class.getName()).log(Level.SEVERE, null, ex);
