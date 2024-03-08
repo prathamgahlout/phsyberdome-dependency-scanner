@@ -1,8 +1,8 @@
 
 
-package com.phsyberdome.common.utils;
+package com.phsyberdome.plugin.npm;
 
-import static com.phsyberdome.common.utils.NPMVersionHelper.fetchAllVersions;
+import static com.phsyberdome.plugin.npm.NPMVersionHelper.fetchAllVersions;
 import com.vdurmont.semver4j.Semver;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +34,7 @@ public class NPMVersionHelperV2 {
         }
         
         sortCandidates(candidates);
-        return candidates.size()>0 ? candidates.get(candidates.size()-1).getValue() : version;
+        return !candidates.isEmpty() ? candidates.get(candidates.size()-1).getValue() : version;
     }
 
     private static void sortCandidates(List<Semver> candidates){

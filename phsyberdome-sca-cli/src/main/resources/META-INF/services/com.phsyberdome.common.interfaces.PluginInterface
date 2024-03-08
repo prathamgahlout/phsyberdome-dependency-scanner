@@ -1,2 +1,3 @@
 com.phsyberdome.plugin.maven.PluginMaven
 com.phsyberdome.plugin.npm.PluginNpm
+com.phsyberdome.plugin.cargo.PluginCargo

@@ -1,6 +1,6 @@
 
 
-package com.phsyberdome.common.utils;
+package com.phsyberdome.plugin.maven;
 
 import java.util.ArrayList;
 import java.util.List;

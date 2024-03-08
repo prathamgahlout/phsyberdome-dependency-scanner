@@ -15,3 +15,4 @@ jshell.history
 /target-old/
 nbactions.xml
 nb-configuration.xml
+/plugin.cargo/nbproject/

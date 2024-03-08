@@ -1,6 +1,6 @@
 
 
-package com.phsyberdome.common.utils;
+package com.phsyberdome.plugin.maven;
 
 import com.vdurmont.semver4j.Semver;
 import com.vdurmont.semver4j.SemverException;

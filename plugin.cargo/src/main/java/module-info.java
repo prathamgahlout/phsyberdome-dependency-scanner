@@ -1,5 +1,5 @@
 
-module PluginNpm {
+module PluginCargo {
     requires CommonUtils;
     requires org.fusesource.jansi;
     requires org.eclipse.jgit;
@@ -15,7 +15,11 @@ module PluginNpm {
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.core;
     requires semver4j;
-    requires java.logging;
+    requires toml4j;
+    requires gson;
     
-    exports com.phsyberdome.plugin.npm;
+    exports com.phsyberdome.plugin.cargo;
+    
+    provides com.phsyberdome.common.interfaces.PluginInterface
+            with com.phsyberdome.plugin.cargo.PluginCargo;
 }
