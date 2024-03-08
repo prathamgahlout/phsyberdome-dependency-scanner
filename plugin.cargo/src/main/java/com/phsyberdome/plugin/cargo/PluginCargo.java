@@ -86,21 +86,22 @@ public class PluginCargo implements PluginInterface{
         Toml dependencies = toml.getTable("dependencies");
         
         Module root = new Module(moduleTitle, version);
-        
-        dependencies.entrySet()
-                .stream()
-                .forEach(
-                   dep -> {
-                       String name = dep.getKey();
-                       String ver = dep.getValue().toString();
-                        
-                       // Resolve version before proceeding
-                       String resolvedVersion = CargoVersionHelper.resolveVersion(ver);
-                       Module module = new Module(name,resolvedVersion);
-                       resolveDependencyTree(module);
-                       root.addToDependencies(module);
-                   }
-                );
+        if(dependencies != null) {
+            dependencies.entrySet()
+                    .stream()
+                    .forEach(
+                       dep -> {
+                           String name = dep.getKey();
+                           String ver = dep.getValue().toString();
+
+                           // Resolve version before proceeding
+                           String resolvedVersion = CargoVersionHelper.resolveVersion(ver);
+                           Module module = new Module(name,resolvedVersion);
+                           resolveDependencyTree(module);
+                           root.addToDependencies(module);
+                       }
+                    );
+        }
         modules.add(root);
         
         return modules;
