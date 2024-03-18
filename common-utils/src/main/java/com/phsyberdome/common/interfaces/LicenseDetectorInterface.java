@@ -2,6 +2,7 @@
 package com.phsyberdome.common.interfaces;
 
 import com.phsyberdome.common.utils.CLIHelper;
+import com.phsyberdome.common.utils.models.LicenseDetectionResult;
 import com.phsyberdome.common.utils.models.Pair;
 import org.fusesource.jansi.Ansi;
 
@@ -12,8 +13,10 @@ import org.fusesource.jansi.Ansi;
  */
 public interface LicenseDetectorInterface {
         
-    default public Pair<String,String> detect(String content) {
-        return new Pair<>("Detector not initialized!","1.0");
+    default public LicenseDetectionResult detect(String content) {
+        var result = new LicenseDetectionResult();
+        result.addProbableLicense(new Pair<>("No dependencies scanned!",1.0));
+        return result;
     }
     
     default public void printScanStats() {

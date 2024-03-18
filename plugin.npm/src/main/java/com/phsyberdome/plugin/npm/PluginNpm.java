@@ -174,10 +174,9 @@ public class PluginNpm implements PluginInterface{
                 modulePath = FileUtil.getFilePathFromURL(registryUrl, this.cloneLocation.toString());
             }
             
-            Pair<String,String> detectionResult = licenseDetector.detect(modulePath.toString());
-            String license = detectionResult.first;
-            m.setLicense(license);
-            m.setAnalyzedContent(detectionResult.second);
+            var detectionResult = licenseDetector.detect(modulePath.toString());
+            m.setLicense(detectionResult.getResultWithMostProbableLicenses().getLicensesAsString());
+            m.setAnalyzedContent(detectionResult.getAnalyzedContent());
             JsonNode dependencies = body.get("dependencies");
             if(dependencies!=null){
                 resolveTransitiveDependencies(m,dependencies);
@@ -235,10 +234,9 @@ public class PluginNpm implements PluginInterface{
                 if(registryUrl == null || registryUrl.isBlank()) continue;
                 Path modulePath = FileUtil.getFilePathFromURL(registryUrl, this.cloneLocation.toString());
             //}
-            Pair<String,String> detectionResult = licenseDetector.detect(modulePath.toString());
-            String license = detectionResult.first;
-            m.setLicense(license);
-            m.setAnalyzedContent(detectionResult.second);
+            var detectionResult = licenseDetector.detect(modulePath.toString());
+            m.setLicense(detectionResult.getResultWithMostProbableLicenses().getLicensesAsString());
+            m.setAnalyzedContent(detectionResult.getAnalyzedContent());
             resolveTransitiveDependencies(m,modulePath);
             scannedDependencies.add(m);
 //            if(body.get("dependencies") != null) {
@@ -270,10 +268,9 @@ public class PluginNpm implements PluginInterface{
                 if(registryUrl == null || registryUrl.isBlank()) continue;
                 modulePath = FileUtil.getFilePathFromURL(registryUrl, this.cloneLocation.toString());
             }
-            Pair<String,String> detectionResult = licenseDetector.detect(modulePath.toString());
-            String license = detectionResult.first;
-            m.setLicense(license);
-            m.setAnalyzedContent(detectionResult.second);
+            var detectionResult = licenseDetector.detect(modulePath.toString());
+            m.setLicense(detectionResult.getResultWithMostProbableLicenses().getLicensesAsString());
+            m.setAnalyzedContent(detectionResult.getAnalyzedContent());
             JsonNode dependencies = body.get("dependencies");
             if(dependencies != null) {
                 resolveTransitiveDependencies(m,dependencies);

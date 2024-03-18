@@ -16,3 +16,4 @@ jshell.history
 nbactions.xml
 nb-configuration.xml
 /plugin.cargo/nbproject/
+/plugin.npm/nbproject/
