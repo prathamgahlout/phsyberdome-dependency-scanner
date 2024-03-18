@@ -178,9 +178,9 @@ public class PluginMaven implements PluginInterface
             return;
         }
         buildDependencyTree(root,path);
-        Pair<String,String> detectionResult = licenseDetector.detect(path.toString());
-        root.setLicense(detectionResult.first);
-        root.setAnalyzedContent(detectionResult.second);
+        var detectionResult = licenseDetector.detect(path.toString());
+        root.setLicense(detectionResult.getResultWithMostProbableLicenses().getLicensesAsString());
+        root.setAnalyzedContent(detectionResult.getAnalyzedContent());
     }
 
     private void buildDependencyTree(Module root, Path pathToModule) {

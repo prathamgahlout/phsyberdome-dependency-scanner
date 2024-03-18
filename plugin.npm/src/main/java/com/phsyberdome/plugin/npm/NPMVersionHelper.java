@@ -354,7 +354,7 @@ public class NPMVersionHelper {
                 temp.append(line);
             }
             List<Pair<String,String>> versionObjs =  JSONHelper.getValues("/versions", temp.toString());
-            return (List<String>) versionObjs.stream().map(pair -> pair.second);
+            return versionObjs.stream().map(pair -> pair.first).toList();
             
         } catch (MalformedURLException ex) {
             Logger.getLogger(NPMVersionHelper.class.getName()).log(Level.SEVERE, null, ex);

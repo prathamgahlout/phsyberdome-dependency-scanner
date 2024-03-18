@@ -84,6 +84,8 @@ public class PluginCargo implements PluginInterface{
         String version = toml.getString("version","null");
         
         Toml dependencies = toml.getTable("dependencies");
+        if(dependencies==null)
+            dependencies = toml.getTable("workspace.dependencies");
         
         Module root = new Module(moduleTitle, version);
         if(dependencies != null) {
@@ -109,17 +111,21 @@ public class PluginCargo implements PluginInterface{
     
     private void resolveDependencyTree(Module module) {
         String license = RegistryHelper.getLicenseFromRegistry(module.getName(), module.getVersion());
+        String analyzedContent = "{Registry-Metadata}";
         if(license.isEmpty()) {
             // Try to see if there is an open source url? If yes then analyze that
             String repoUrl = RegistryHelper.getSourceCodeRepoLink(module.getName());
             if(!repoUrl.isEmpty()) {
                 Path path = FileUtil.getFilePathFromURL(repoUrl,this.cloneLocation.toString());
                 if(path!=null){
-                    license = licenseDetector.detect(path.toString()).first;
+                    var detectionResults = licenseDetector.detect(path.toString());
+                    license = detectionResults.getResultWithMostProbableLicenses().getLicensesAsString();
+                    analyzedContent = detectionResults.getAnalyzedContent();
                 }
             }
         }
         module.setLicense(license);
+        module.setAnalyzedContent(analyzedContent);
         // Get dependencies declared in the registry against this version
         List<Pair<String,String>> depData = RegistryHelper.getDependenciesOfCrate(module.getName(),module.getVersion());
         for(var dep: depData) {

@@ -4,6 +4,7 @@ package com.phsyberdome.plugin.npm;
 
 import static com.phsyberdome.plugin.npm.NPMVersionHelper.fetchAllVersions;
 import com.vdurmont.semver4j.Semver;
+import com.vdurmont.semver4j.SemverException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,9 +28,12 @@ public class NPMVersionHelperV2 {
         List<String> allVersions = fetchAllVersions(name);
         List<Semver> candidates = new ArrayList<>();
         for(String ver:allVersions){
-            Semver semver = new Semver(ver,Semver.SemverType.NPM);
-            if(semver.satisfies(version)){
-                candidates.add(semver);
+            try {
+                Semver semver = new Semver(ver,Semver.SemverType.NPM);
+                if(semver.satisfies(version)){
+                    candidates.add(semver);
+                }
+            } catch(SemverException ex) {
             }
         }
         

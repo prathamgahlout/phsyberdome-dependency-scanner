@@ -6,6 +6,7 @@ import com.phsyberdome.common.interfaces.LicenseDetectorInterface;
 import com.phsyberdome.common.utils.CLIHelper;
 import com.phsyberdome.common.utils.models.Pair;
 import com.phsyberdome.common.utils.FileUtil;
+import com.phsyberdome.common.utils.models.LicenseDetectionResult;
 import com.phsyberdome.common.utils.NetworkHelper;
 import java.io.File;
 import java.nio.file.Path;
@@ -96,13 +97,13 @@ public class LicenseDetector implements LicenseDetectorInterface {
         return queryResult;
     }
    
-    public Pair<String,String> detect(String path){
+    public LicenseDetectionResult detect(String path){
         // Check if it is valid url
         
         if(NetworkHelper.isValidURL(path)){
             
             Path rootPath = FileUtil.getFilePathFromURL(path,cloneLocation.toString());
-            Pair<String,String> result = filePathDetection(rootPath.toString());
+            LicenseDetectionResult result = filePathDetection(rootPath.toString());
             if(rootPath.toFile().exists()){
                 FileUtil.deleteDirectory(rootPath.toFile());
             }
@@ -114,8 +115,9 @@ public class LicenseDetector implements LicenseDetectorInterface {
     }
     
     
-    private Pair<String,String> filePathDetection(String path) {
+    private LicenseDetectionResult filePathDetection(String path) {
         Path pathToFile = searchLicenseFile(path);
+        var results = new LicenseDetectionResult();
         totalScanned++;
         if(pathToFile == null) {
             CLIHelper.updateCurrentLine("Couldn't get license file at "+path,Ansi.Color.RED);
@@ -124,19 +126,29 @@ public class LicenseDetector implements LicenseDetectorInterface {
             // Maybe handover this responsiblity to the cloud service.
             pathToFile = searchReadmeFile(path);
             if(pathToFile == null){
-                return new Pair<>("null","null");
+                results.addProbableLicense(new Pair<>("null",0.0));
+                results.setAnalyzedContent("");
+                return results;
             }
             String content = FileUtil.readFile(pathToFile);
-            return new Pair<>("null",content);
+            results.addProbableLicense(new Pair<>("null",0.0));
+            results.setAnalyzedContent("");
+            return results;
         }
 
         String content = readLicense(pathToFile);
 
         Map<String,Double> res = analyze(content);
         if(res.isEmpty()) {
-            return new Pair<>("null","null");
+            results.addProbableLicense(new Pair<>("null",0.0));
+            results.setAnalyzedContent(content);
+            return results;
         }else{
-            return new Pair<>(res.entrySet().iterator().next().getKey(),content);
+            res.entrySet().forEach(possibility ->  {
+                results.addProbableLicense(new Pair<>(possibility.getKey(), possibility.getValue()));
+            });
+            results.setAnalyzedContent(content);
+            return results;
         }
     }
     
