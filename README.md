@@ -27,7 +27,7 @@ The tool scans the metadata file (e.g. pom.xml for maven based projects and pack
 - [ ] JAVA Gradle
 - [ ] PyPI
 - [ ] Rubygems
-- [ ] Cargo
+- [X] Cargo
 - [ ] Go Packages
 
 ### Misc
