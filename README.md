@@ -23,8 +23,8 @@ The tool scans the metadata file (e.g. pom.xml for maven based projects and pack
 ### Supported package/project managers
 
 - [X] NPM
-- [X] JAVA Maven
-- [ ] JAVA Gradle
+- [X] Maven
+- [ ] Gradle
 - [ ] PyPI
 - [ ] Rubygems
 - [X] Cargo
