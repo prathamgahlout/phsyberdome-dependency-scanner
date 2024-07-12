@@ -11,6 +11,9 @@ import com.phsyberdome.common.utils.JSONHelper;
 import com.phsyberdome.common.utils.NetworkHelper;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.UUID;
 import org.fusesource.jansi.Ansi.Color;
 
 /**
@@ -54,7 +57,7 @@ public class Drona {
         DependencyExcavator excavator = new DependencyExcavator();
 
         DependencyScanResult result = excavator.excavate();
-
+        saveResultAsJson(result);
         printResult(result);
 
         /**
@@ -89,6 +92,21 @@ public class Drona {
             DependencyTree tree = new DependencyTree(json);
             tree.prettyPrintTree();
         }   
+    }
+    
+    private static void saveResultAsJson(DependencyScanResult result) {
+        final Calendar calendar = Calendar.getInstance();
+        String timestamp =  String.valueOf(calendar.get(Calendar.DAY_OF_MONTH))+String.valueOf(calendar.get(Calendar.MONTH))+String.valueOf(calendar.get(Calendar.YEAR));
+        
+        String fileName = "scan_report_"+UUID.randomUUID()+"_"+timestamp+".json";
+        for(DependencyManager manager: result.getResult()){
+            String json = JSONHelper.convertToJson(manager);
+            if(FileUtil.writeToFile(fileName, json, Configuration.getConfiguration().getBasePath().toString()) == false) {
+                CLIHelper.printLine("Failed to export file!");
+                return;
+            }
+        }
+        CLIHelper.printLine("Successfully exported data to "+Configuration.getConfiguration().getBasePath().resolve(fileName).toAbsolutePath());
     }
     
     

@@ -56,33 +56,57 @@ public class DependencyTree {
 
     public void prettyPrintTree() {
         CLIHelper.updateCurrentLine("", Ansi.Color.YELLOW);
-        printNode(rootNode, "");
+        CLIHelper.printLine(createTreeWithAnsiChars(rootNode, ""), Ansi.Color.YELLOW);
     }
     
-    private void printNode(TreeNode node, String prefix) {
+    public String createTreeWithAnsiChars(TreeNode node, String prefix) {
         if(node == null) {
-            return;
+            return "";
         }
-        String nodeName = node.getModule().getName() + "@" + node.getModule().getVersion();
+        String result = "";
+        String nodeName = ansi().fg(Ansi.Color.YELLOW).a(node.getModule().getName() + "@" + node.getModule().getVersion()).reset().toString();
         if(node.getModule().getLicense() != null && node.getModule().getLicense().equals("null")==false) {
             nodeName += ansi().fg(Ansi.Color.GREEN).a("[" + node.getModule().getLicense() + "]");
         }
-        
-        CLIHelper.printLine(nodeName, Ansi.Color.YELLOW);
+        result += nodeName + "\n";
         int NO_OF_CHILDREN = node.getChildren().size();
         for(int i=0;i<NO_OF_CHILDREN;i++) {
             TreeNode m = node.getChildren().get(i);
-            CLIHelper.print(prefix, Ansi.Color.RED);
+            result += ansi().fg(Ansi.Color.RED).a(prefix).reset();
             if(i==NO_OF_CHILDREN-1){
-                CLIHelper.print(CLIHelper.CORNER, Ansi.Color.RED);
-                printNode(m, prefix + CLIHelper.SPACE_2);
+                result += ansi().fg(Ansi.Color.RED).a(CLIHelper.CORNER).reset();
+                result += createTreeWithAnsiChars(m,prefix + CLIHelper.SPACE_2);
             }else{
-                CLIHelper.print(CLIHelper.CROSS, Ansi.Color.RED);
-                printNode(m, prefix + CLIHelper.VERTICAL);
+                result += ansi().fg(Ansi.Color.RED).a(CLIHelper.CROSS).reset();
+                result += createTreeWithAnsiChars(m,prefix + CLIHelper.VERTICAL);
             }
         }
+        return result;
     }
     
-    
+     public String createTree(TreeNode node, String prefix) {
+        if(node == null) {
+            return "";
+        }
+        String result = "";
+        String nodeName = node.getModule().getName() + "@" + node.getModule().getVersion();
+        if(node.getModule().getLicense() != null && node.getModule().getLicense().equals("null")==false) {
+            nodeName += "[" + node.getModule().getLicense() + "]";
+        }
+        result += nodeName + "\n";
+        int NO_OF_CHILDREN = node.getChildren().size();
+        for(int i=0;i<NO_OF_CHILDREN;i++) {
+            TreeNode m = node.getChildren().get(i);
+            result += prefix;
+            if(i==NO_OF_CHILDREN-1){
+                result += CLIHelper.CORNER;
+                result += createTree(m,prefix + CLIHelper.SPACE_2);
+            }else{
+                result += CLIHelper.CROSS;
+                result += createTree(m,prefix + CLIHelper.VERTICAL);
+            }
+        }
+        return result;
+    }
     
 }
