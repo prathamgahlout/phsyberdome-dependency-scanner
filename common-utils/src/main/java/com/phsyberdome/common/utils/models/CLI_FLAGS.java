@@ -6,5 +6,7 @@ package com.phsyberdome.common.utils.models;
  */
 public enum CLI_FLAGS {
     src,
-    dest
+    dest,
+    v,
+    verbose
 }

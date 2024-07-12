@@ -150,6 +150,10 @@ public class CLIHelper {
         System.out.println(ansi().fg(color).a(data).reset());
     }
     
+    public static void printLine(String data) {
+        System.out.println(data);
+    }
+    
     public static void print(String data, Color color) {
         System.out.print(ansi().fg(color).a(data).reset());
     }

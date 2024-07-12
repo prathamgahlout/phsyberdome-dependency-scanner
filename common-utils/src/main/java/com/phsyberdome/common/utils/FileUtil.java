@@ -336,5 +336,15 @@ public class FileUtil {
         File file = FileSystems.getDefault().getPath(loc).toFile();
         deleteDirectory(file);
     }
+    
+    public static boolean writeToFile(String fileName, String contents, String path) {
+        try {
+            File file = FileSystems.getDefault().getPath(path).resolve(fileName).toFile();
+            FileUtils.writeStringToFile(file, contents, "UTF-8", true);
+            return true;
+        } catch(IOException | InvalidPathException e) {
+            return false;
+        }
+    }
 
 }

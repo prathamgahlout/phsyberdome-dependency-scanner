@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.phsyberdome</groupId>
     <artifactId>phsyberdome-sca-cli</artifactId>
-    <version>1.0.6-beta</version>
+    <version>1.0.7-beta</version>
     <packaging>jar</packaging>
     <build>
         <plugins>
@@ -69,7 +69,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>common-utils</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
